@@ -7,6 +7,7 @@ import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { MembersPage } from '@/features/members/MembersPage';
+import { MemberDetailPage } from '@/features/members/MemberDetailPage';
 
 export default function App() {
   return (
@@ -22,7 +23,7 @@ export default function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/members" element={<MembersPage />} />
-          {/* Task 30 adds /members/:id */}
+          <Route path="/members/:id" element={<MemberDetailPage />} />
           {/* Task 31 adds /expiry */}
           {/* Task 32 adds /action-required */}
           {/* Task 33 adds /expenses */}
