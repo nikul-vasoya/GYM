@@ -9,6 +9,7 @@ import { authRouter } from './features/auth/auth.routes.js';
 import { packagesRouter } from './features/packages/packages.routes.js';
 import { membersRouter } from './features/members/members.routes.js';
 import { expensesRouter } from './features/expenses/expenses.routes.js';
+import { dashboardRouter } from './features/dashboard/dashboard.routes.js';
 
 /**
  * Builds the Express app without starting a server.
@@ -49,7 +50,7 @@ export const createApp = () => {
   app.use('/api/packages', packagesRouter);
   app.use('/api/members', membersRouter);
   app.use('/api/expenses', expensesRouter);
-  // Feature routers are mounted here as they are built (Task 19).
+  app.use('/api/dashboard', dashboardRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
