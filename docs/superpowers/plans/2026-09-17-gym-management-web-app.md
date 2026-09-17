@@ -601,7 +601,7 @@ import { readEnv } from '../../src/config/env.js';
 
 const valid = {
   NODE_ENV: 'development',
-  PORT: '5000',
+  PORT: '4000',
   MONGODB_URI: 'mongodb://localhost:27017/gym_project',
   JWT_SECRET: 'a-secret-that-is-at-least-32-characters-long',
   CLIENT_URL: 'http://localhost:5173',
@@ -611,15 +611,15 @@ describe('readEnv', () => {
   it('returns typed config when every variable is present', () => {
     const config = readEnv(valid);
 
-    expect(config.port).toBe(5000);
+    expect(config.port).toBe(4000);
     expect(config.mongodbUri).toBe('mongodb://localhost:27017/gym_project');
     expect(config.jwtSecret).toHaveLength(44);
     expect(config.clientUrl).toBe('http://localhost:5173');
   });
 
-  it('falls back to port 5000 when PORT is absent', () => {
+  it('falls back to port 4000 when PORT is absent', () => {
     const { PORT, ...withoutPort } = valid;
-    expect(readEnv(withoutPort).port).toBe(5000);
+    expect(readEnv(withoutPort).port).toBe(4000);
   });
 
   it('throws a named-variable message when MONGODB_URI is missing', () => {
@@ -651,7 +651,7 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().positive().default(5000),
+  PORT: z.coerce.number().int().positive().default(4000),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
@@ -713,7 +713,7 @@ Expected: PASS — `4 passed`.
 
 ```bash
 NODE_ENV=development
-PORT=5000
+PORT=4000
 
 # MongoDB Atlas connection string. Ask the project owner for the real value.
 MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/gym_project
@@ -738,7 +738,7 @@ Then create `server/.env`, pasting that output as `JWT_SECRET`:
 
 ```bash
 NODE_ENV=development
-PORT=5000
+PORT=4000
 MONGODB_URI=mongodb+srv://dev:<ATLAS_PASSWORD>@node-setup.jmnbj.mongodb.net/gym_project?retryWrites=true&w=majority
 JWT_SECRET=<paste the generated string here>
 JWT_EXPIRES_IN=7d
@@ -849,14 +849,14 @@ In one terminal:
 npm run dev:server
 ```
 
-Expected: `[db] connected` then `[api] listening on http://localhost:5000`.
+Expected: `[db] connected` then `[api] listening on http://localhost:4000`.
 
 If it prints `connection failed`, the cause is almost always Atlas Network Access — add your current IP in the Atlas dashboard under Network Access.
 
 In a second terminal:
 
 ```bash
-curl -s http://localhost:5000/api/health
+curl -s http://localhost:4000/api/health
 ```
 
 Expected: `{"status":"ok","timestamp":"..."}`
@@ -5454,7 +5454,7 @@ export default defineConfig({
     port: 5173,
     // The client calls '/api/...' in both dev and production, so no base URL
     // juggling and no CORS surprises during development.
-    proxy: { '/api': { target: 'http://localhost:5000', changeOrigin: true } },
+    proxy: { '/api': { target: 'http://localhost:4000', changeOrigin: true } },
   },
 });
 ```
@@ -5598,7 +5598,7 @@ createRoot(document.getElementById('root')).render(
 npm run dev
 ```
 
-Expected: the `api` stream prints `[db] connected` and `[api] listening on http://localhost:5000`; the `web` stream prints a Vite URL on port 5173. Open http://localhost:5173 and confirm the heading renders with Tailwind spacing applied.
+Expected: the `api` stream prints `[db] connected` and `[api] listening on http://localhost:4000`; the `web` stream prints a Vite URL on port 5173. Open http://localhost:5173 and confirm the heading renders with Tailwind spacing applied.
 
 Stop with `Ctrl+C`.
 
@@ -11236,7 +11236,7 @@ npm install
 cp server/.env.example server/.env   # then fill in the real values
 cp client/.env.example client/.env
 npm run seed                         # creates packages and demo accounts
-npm run dev                          # API on :5000, web on :5173
+npm run dev                          # API on :4000, web on :5173
 ```
 
 ### Environment variables (`server/.env`)
@@ -11248,7 +11248,7 @@ npm run dev                          # API on :5000, web on :5173
 | `JWT_EXPIRES_IN` | Session length, default `7d` |
 | `CLIENT_URL` | Used to build password-reset links |
 | `RESET_TOKEN_TTL_MINUTES` | Reset-link lifetime, default `30` |
-| `PORT` | API port, default `5000` |
+| `PORT` | API port, default `4000` |
 
 ## Scripts
 
