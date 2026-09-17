@@ -1078,18 +1078,22 @@ describe('Member model', () => {
   });
 
   it('rejects a duplicate email regardless of casing', async () => {
-    await Member.create(buildMember());
+    const pkg = await Package.create(basePackage);
+    await Member.create(buildMember({ package: pkg._id }));
     await Member.init();
 
     await expect(
-      Member.create(buildMember({ name: 'Other', phone: '9000000000' })),
+      Member.create(buildMember({ package: pkg._id, name: 'Other', phone: '9000000000' })),
     ).rejects.toThrow();
   });
 
   it('allows many members with no email at all', async () => {
+    const pkg = await Package.create(basePackage);
     await Member.init();
-    await Member.create(buildMember({ email: undefined, phone: '9000000001' }));
-    await Member.create(buildMember({ email: undefined, phone: '9000000002', name: 'Second' }));
+    await Member.create(buildMember({ package: pkg._id, email: undefined, phone: '9000000001' }));
+    await Member.create(
+      buildMember({ package: pkg._id, email: undefined, phone: '9000000002', name: 'Second' }),
+    );
 
     expect(await Member.countDocuments()).toBe(2);
   });
