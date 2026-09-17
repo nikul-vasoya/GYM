@@ -12,6 +12,7 @@ import { ExpiryPage } from '@/features/expiry/ExpiryPage';
 import { ActionRequiredPage } from '@/features/actionRequired/ActionRequiredPage';
 import { ExpensesPage } from '@/features/expenses/ExpensesPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { NotFoundPage } from '@/components/shared/NotFoundPage';
 
 export default function App() {
   return (
@@ -32,10 +33,11 @@ export default function App() {
           <Route path="/action-required" element={<ActionRequiredPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

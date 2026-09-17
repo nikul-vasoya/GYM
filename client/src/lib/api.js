@@ -20,6 +20,26 @@ api.interceptors.request.use((config) => {
 });
 
 /**
+ * A rejected token anywhere in the app means the session is over.
+ *
+ * Clearing storage and hard-navigating to /login avoids a cascade of failed
+ * requests and a half-rendered authenticated shell.
+ */
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isAuthEndpoint = error?.config?.url?.startsWith('/auth/');
+
+    if (error?.response?.status === 401 && !isAuthEndpoint && getStoredToken()) {
+      clearStoredToken();
+      window.location.assign('/login');
+    }
+
+    return Promise.reject(error);
+  },
+);
+
+/**
  * Turns any axios failure into a plain Error with a message worth showing.
  *
  * Every screen can then do `toast.error(getErrorMessage(error))` without
