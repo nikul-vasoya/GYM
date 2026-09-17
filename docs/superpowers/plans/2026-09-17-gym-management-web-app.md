@@ -2814,7 +2814,7 @@ export const monthRangeUtc = (month) => {
 cd server && npx vitest run tests/unit/dates.test.js
 ```
 
-Expected: PASS — `14 passed`.
+Expected: PASS — `16 passed`.
 
 - [ ] **Step 5: Write the failing membership test**
 
@@ -3032,7 +3032,7 @@ export const nextRenewalStartDate = (currentEndDate, today = todayUtc()) => {
 cd server && npx vitest run tests/unit/membership.test.js
 ```
 
-Expected: PASS — `19 passed`.
+Expected: PASS — `22 passed`.
 
 - [ ] **Step 9: Commit**
 
