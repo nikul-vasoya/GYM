@@ -8,6 +8,7 @@ import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { MembersPage } from '@/features/members/MembersPage';
 import { MemberDetailPage } from '@/features/members/MemberDetailPage';
+import { ExpiryPage } from '@/features/expiry/ExpiryPage';
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/members/:id" element={<MemberDetailPage />} />
-          {/* Task 31 adds /expiry */}
+          <Route path="/expiry" element={<ExpiryPage />} />
           {/* Task 32 adds /action-required */}
           {/* Task 33 adds /expenses */}
           {/* Task 34 adds /settings */}
