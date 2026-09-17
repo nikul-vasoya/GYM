@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { env } from './config/env.js';
 
 /**
  * Builds the Express app without starting a server.
@@ -15,7 +16,15 @@ export const createApp = () => {
   const app = express();
 
   app.use(helmet());
-  app.use(cors({ origin: true, credentials: true }));
+
+  // Only the app's own origin may call the API with credentials. Tests and
+  // same-origin production requests send no Origin header and are unaffected.
+  app.use(
+    cors({
+      origin: process.env.NODE_ENV === 'test' ? true : env().clientUrl,
+      credentials: true,
+    }),
+  );
   app.use(express.json({ limit: '1mb' }));
 
   if (process.env.NODE_ENV !== 'test') {
