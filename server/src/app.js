@@ -5,6 +5,7 @@ import morgan from 'morgan';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { env } from './config/env.js';
+import { authRouter } from './features/auth/auth.routes.js';
 
 /**
  * Builds the Express app without starting a server.
@@ -35,7 +36,8 @@ export const createApp = () => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Feature routers are mounted here as they are built (Tasks 8, 15, 17, 18, 19).
+  app.use('/api/auth', authRouter);
+  // Feature routers are mounted here as they are built (Tasks 15, 17, 18, 19).
 
   app.use(notFoundHandler);
   app.use(errorHandler);
