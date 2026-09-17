@@ -802,7 +802,46 @@ const start = async () => {
 start();
 ```
 
-- [ ] **Step 10: Verify the server really reaches Atlas**
+- [ ] **Step 10: Tighten the CORS origin in `server/src/app.js`**
+
+> **Plan amendment (added after the Task 2 code review).** Task 2 shipped
+> `cors({ origin: true, credentials: true })`, which reflects *any* calling
+> origin while allowing credentials. That is safe in this architecture today —
+> dev goes through the Vite proxy and production serves the built client from
+> the same origin, so the real client never makes a cross-origin call, and auth
+> is a bearer JWT rather than a cookie. It stops being safe the moment anyone
+> adds a cookie-based feature. `CLIENT_URL` now exists, so pin it.
+
+Add `env` to the imports in `server/src/app.js`:
+
+```js
+import { env } from './config/env.js';
+```
+
+Replace the `cors(...)` line with:
+
+```js
+  // Only the app's own origin may call the API with credentials. Tests and
+  // same-origin production requests send no Origin header and are unaffected.
+  app.use(
+    cors({
+      origin: process.env.NODE_ENV === 'test' ? true : env().clientUrl,
+      credentials: true,
+    }),
+  );
+```
+
+Run the existing tests to confirm nothing broke:
+
+```bash
+cd server && npx vitest run tests/api/health.test.js
+```
+
+Expected: PASS — the health tests still pass, because Supertest issues
+same-origin requests with no `Origin` header.
+
+
+- [ ] **Step 11: Verify the server really reaches Atlas**
 
 In one terminal:
 
@@ -824,11 +863,11 @@ Expected: `{"status":"ok","timestamp":"..."}`
 
 Stop the server with `Ctrl+C`.
 
-- [ ] **Step 11: Commit**
+- [ ] **Step 12: Commit**
 
 ```bash
-git add server/src/config server/src/index.js server/.env.example server/tests/unit/env.test.js
-git commit -m "feat(server): add validated env config and mongodb atlas connection"
+git add server/src/config server/src/index.js server/src/app.js server/.env.example server/tests/unit/env.test.js
+git commit -m "feat(server): add validated env config, atlas connection and scoped cors"
 ```
 
 ---
