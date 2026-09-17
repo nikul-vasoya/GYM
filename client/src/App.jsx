@@ -11,6 +11,7 @@ import { MemberDetailPage } from '@/features/members/MemberDetailPage';
 import { ExpiryPage } from '@/features/expiry/ExpiryPage';
 import { ActionRequiredPage } from '@/features/actionRequired/ActionRequiredPage';
 import { ExpensesPage } from '@/features/expenses/ExpensesPage';
+import { SettingsPage } from '@/features/settings/SettingsPage';
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
           <Route path="/expiry" element={<ExpiryPage />} />
           <Route path="/action-required" element={<ActionRequiredPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
-          {/* Task 34 adds /settings */}
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
