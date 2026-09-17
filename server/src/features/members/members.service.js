@@ -1,7 +1,7 @@
 import { Member } from '../../models/Member.js';
 import { Package } from '../../models/Package.js';
 import { ApiError } from '../../lib/ApiError.js';
-import { calculateEndDate } from '../../lib/membership.js';
+import { calculateEndDate, nextRenewalStartDate } from '../../lib/membership.js';
 import { toUtcMidnight, todayUtc } from '../../lib/dates.js';
 import { buildMemberFilter } from './members.query.js';
 
@@ -96,4 +96,31 @@ export const updateMember = async (id, { packageId, startDate, ...details }) => 
   return member;
 };
 
-// `renewMember` is added in Step 12, after its test is written and failing.
+/**
+ * Renews a membership (decision D8, SRS §3.3).
+ *
+ * Archives the period that is ending into `history` and starts a new one, so
+ * the member drops out of the Expiry list and the gym keeps a purchase record.
+ */
+export const renewMember = async (id, { packageId } = {}) => {
+  const member = await getMember(id);
+  const pkg = await loadSellablePackage(packageId ?? member.package.toString());
+
+  member.history.push({
+    package: member.package,
+    packageName: member.packageName,
+    packagePrice: member.packagePrice,
+    durationMonths: member.durationMonths,
+    startDate: member.startDate,
+    endDate: member.endDate,
+  });
+
+  const start = nextRenewalStartDate(member.endDate);
+
+  Object.assign(member, snapshotOf(pkg));
+  member.startDate = start;
+  member.endDate = calculateEndDate(start, pkg.durationMonths);
+
+  await member.save();
+  return member;
+};
