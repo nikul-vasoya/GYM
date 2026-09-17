@@ -7,6 +7,14 @@ process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-that-is-definitely-long-enough-32';
 process.env.CLIENT_URL = 'http://localhost:5173';
 
+// Seeded here, not just in beforeAll: `dotenv/config` (imported by
+// src/config/env.js) fills any UNSET key from the developer's real .env,
+// which holds a live Atlas credential. Claiming the key synchronously —
+// before any test file's imports are evaluated — means an eagerly-cached
+// env() can never capture the production URI. beforeAll overwrites this
+// with the real in-memory server URI once it is known.
+process.env.MONGODB_URI = 'mongodb://127.0.0.1:27017/placeholder-replaced-in-beforeAll';
+
 let mongoServer;
 
 beforeAll(async () => {
