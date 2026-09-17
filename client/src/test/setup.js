@@ -8,16 +8,22 @@ afterEach(() => {
 });
 
 // Radix UI measures elements that jsdom does not implement.
+//
+// This is a plain function, not `vi.fn()` — a test file's
+// `vi.restoreAllMocks()` in `beforeEach` would otherwise strip the
+// implementation back to a no-op after the first test, making
+// `window.matchMedia(...)` return `undefined` and crashing anything (like
+// framer-motion's reduced-motion check) that calls `.addListener` on it.
 beforeAll(() => {
-  window.matchMedia ??= vi.fn().mockImplementation((query) => ({
+  window.matchMedia ??= (query) => ({
     matches: false,
     media: query,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }));
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => {},
+  });
 
   window.ResizeObserver ??= class {
     observe() {}
