@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { hashPassword, verifyPassword, passwordSchema } from '../../src/lib/password.js';
+import {
+  hashPassword,
+  verifyPassword,
+  verifyPasswordConstantTime,
+  passwordSchema,
+} from '../../src/lib/password.js';
 
 describe('passwordSchema', () => {
   it('accepts a password with letters and numbers at the minimum length', () => {
@@ -44,5 +49,16 @@ describe('hashPassword / verifyPassword', () => {
 
   it('returns false rather than throwing when the stored hash is missing', async () => {
     expect(await verifyPassword('gympass1', undefined)).toBe(false);
+  });
+});
+
+describe('verifyPasswordConstantTime', () => {
+  it('returns false for a missing hash without throwing', async () => {
+    expect(await verifyPasswordConstantTime('anything1', undefined)).toBe(false);
+  });
+
+  it('still verifies a correct password', async () => {
+    const hash = await hashPassword('gympass1');
+    expect(await verifyPasswordConstantTime('gympass1', hash)).toBe(true);
   });
 });

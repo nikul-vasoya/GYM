@@ -6,6 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-that-is-definitely-long-enough-32';
 process.env.CLIENT_URL = 'http://localhost:5173';
+process.env.ALLOW_DEV_RESET_TOKEN = 'true';
 
 // Seeded here, not just in beforeAll: `dotenv/config` (imported by
 // src/config/env.js) fills any UNSET key from the developer's real .env,

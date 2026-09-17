@@ -29,3 +29,13 @@ export const verifyPassword = async (plainText, hash) => {
   if (!hash) return false;
   return bcrypt.compare(plainText, hash);
 };
+
+/**
+ * A real bcrypt hash of a throwaway value, compared against when no user is
+ * found so that a failed login costs the same whether the account exists or
+ * not. Without this, response time alone reveals which emails are registered.
+ */
+const DUMMY_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+
+export const verifyPasswordConstantTime = async (plainText, hash) =>
+  bcrypt.compare(plainText, hash ?? DUMMY_HASH);

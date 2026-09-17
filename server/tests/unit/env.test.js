@@ -32,4 +32,9 @@ describe('readEnv', () => {
   it('rejects a JWT secret short enough to brute force', () => {
     expect(() => readEnv({ ...valid, JWT_SECRET: 'short' })).toThrow(/JWT_SECRET/);
   });
+
+  it('does not allow dev reset-token disclosure unless explicitly enabled', () => {
+    expect(readEnv(valid).allowDevResetToken).toBe(false);
+    expect(readEnv({ ...valid, ALLOW_DEV_RESET_TOKEN: 'true' }).allowDevResetToken).toBe(true);
+  });
 });

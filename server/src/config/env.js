@@ -9,6 +9,16 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('7d'),
   CLIENT_URL: z.string().url().default('http://localhost:5173'),
   RESET_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(30),
+
+  /**
+   * Returns the raw password-reset token in the API response so the flow can
+   * be completed without an email provider. Opt-in and defaults to OFF: a
+   * missing or forgotten env var must never cause a secret to be disclosed.
+   */
+  ALLOW_DEV_RESET_TOKEN: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 });
 
 /**
@@ -35,6 +45,7 @@ export const readEnv = (source) => {
     jwtExpiresIn: parsed.data.JWT_EXPIRES_IN,
     clientUrl: parsed.data.CLIENT_URL,
     resetTokenTtlMinutes: parsed.data.RESET_TOKEN_TTL_MINUTES,
+    allowDevResetToken: parsed.data.ALLOW_DEV_RESET_TOKEN,
     isProduction: parsed.data.NODE_ENV === 'production',
     isTest: parsed.data.NODE_ENV === 'test',
   };

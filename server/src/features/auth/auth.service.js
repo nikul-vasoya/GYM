@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../../models/User.js';
 import { ApiError } from '../../lib/ApiError.js';
-import { verifyPassword, hashPassword } from '../../lib/password.js';
+import { verifyPassword, verifyPasswordConstantTime, hashPassword } from '../../lib/password.js';
 import { createResetToken, hashToken } from '../../lib/token.js';
 import { sendResetEmail } from './email.js';
 import { env } from '../../config/env.js';
@@ -22,7 +22,11 @@ export const signToken = (user) => {
 export const login = async ({ email, password }) => {
   const user = await User.findOne({ email }).select('+passwordHash');
 
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  // Always run a real bcrypt comparison, even when the user does not exist,
+  // so response timing cannot be used to enumerate registered addresses.
+  const passwordMatches = await verifyPasswordConstantTime(password, user?.passwordHash);
+
+  if (!user || !passwordMatches) {
     throw ApiError.unauthorized();
   }
 
@@ -36,8 +40,9 @@ const GENERIC_RESET_MESSAGE =
 /**
  * Issues a password-reset token.
  *
- * In development the raw token comes back in the response so the flow can be
- * completed without an email provider. In production it is only emailed.
+ * When ALLOW_DEV_RESET_TOKEN is explicitly enabled, the raw token comes back
+ * in the response so the flow can be completed without an email provider.
+ * Otherwise it is only emailed.
  */
 export const requestPasswordReset = async ({ email }) => {
   const config = env();
@@ -59,7 +64,9 @@ export const requestPasswordReset = async ({ email }) => {
 
   return {
     message: GENERIC_RESET_MESSAGE,
-    ...(config.isProduction ? {} : { resetToken: token, resetUrl }),
+    // Opt-in only. Never keyed off the absence of production, because an
+    // unset NODE_ENV would then silently disclose a working reset token.
+    ...(config.allowDevResetToken ? { resetToken: token, resetUrl } : {}),
   };
 };
 
