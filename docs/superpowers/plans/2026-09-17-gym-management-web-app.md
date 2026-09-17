@@ -6538,6 +6538,7 @@ export const Sidebar = ({ onNavigate }) => (
 - [ ] **Step 6: Create `client/src/components/layout/Topbar.jsx`**
 
 ```jsx
+import { useNavigate } from 'react-router-dom';
 import { LogOut, Menu, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -6554,6 +6555,14 @@ import { useAuth } from '@/features/auth/useAuth';
 
 export const Topbar = ({ onOpenNav }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Clearing the user is not enough on its own — without navigating, the
+  // signed-out user stays on the page they were already looking at.
+  const onSignOut = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-md md:px-6">
@@ -6586,7 +6595,7 @@ export const Topbar = ({ onOpenNav }) => {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={logout}>
+            <DropdownMenuItem onSelect={onSignOut}>
               <LogOut className="mr-2 size-4" />
               Sign out
             </DropdownMenuItem>
