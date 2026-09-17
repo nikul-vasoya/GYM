@@ -18,6 +18,12 @@ import { membersRouter } from './features/members/members.routes.js';
 export const createApp = () => {
   const app = express();
 
+  // The production deployment proxies /api to this process, so req.ip must be
+  // taken from X-Forwarded-For. Without this, express-rate-limit keys every
+  // request to the proxy's address and the login limit becomes one shared
+  // bucket for all staff. Value is the number of trusted proxy hops.
+  app.set('trust proxy', 1);
+
   app.use(helmet());
 
   // Only the app's own origin may call the API with credentials. Tests and
