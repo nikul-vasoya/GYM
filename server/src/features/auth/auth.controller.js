@@ -4,3 +4,7 @@ export const login = async (req, res) => {
   const { user, token } = await authService.login(req.body);
   res.json({ user, token });
 };
+
+export const me = async (req, res) => {
+  res.json({ user: req.user.toJSON() });
+};

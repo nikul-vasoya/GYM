@@ -2,6 +2,7 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import { validate } from '../../middleware/validate.js';
+import { requireAuth } from '../../middleware/requireAuth.js';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import { loginSchema } from './auth.schema.js';
 import * as authController from './auth.controller.js';
@@ -25,3 +26,5 @@ authRouter.post(
   validate(loginSchema),
   asyncHandler(authController.login),
 );
+
+authRouter.get('/me', requireAuth, asyncHandler(authController.me));
