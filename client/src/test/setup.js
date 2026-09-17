@@ -34,4 +34,14 @@ beforeAll(() => {
   Element.prototype.scrollIntoView ??= vi.fn();
   Element.prototype.hasPointerCapture ??= vi.fn();
   Element.prototype.releasePointerCapture ??= vi.fn();
+
+  // jsdom's requestAnimationFrame delivers real frames on a real clock, so a
+  // duration-bound animation (e.g. StatCard's count-up) takes just as long
+  // in a test as it would in a browser — long enough to blow past
+  // `findBy*`'s default 1000ms timeout. Deliver every frame immediately with
+  // a timestamp far past any animation's duration, so such animations
+  // settle to their final value on the first frame instead of ticking in
+  // real time. Nothing in this suite asserts on an animation mid-flight.
+  window.requestAnimationFrame = (callback) => setTimeout(() => callback(performance.now() + 10_000), 0);
+  window.cancelAnimationFrame = (id) => clearTimeout(id);
 });

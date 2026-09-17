@@ -5,6 +5,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
 
 export default function App() {
   return (
@@ -18,7 +19,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          {/* Task 27 adds /dashboard */}
+          <Route path="/dashboard" element={<DashboardPage />} />
           {/* Task 28 adds /members */}
           {/* Task 30 adds /members/:id */}
           {/* Task 31 adds /expiry */}
