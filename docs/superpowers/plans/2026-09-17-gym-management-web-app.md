@@ -5395,11 +5395,14 @@ Goal: a signed-in user lands on an app shell with working navigation and a theme
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-select": "^2.1.4",
+    "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.1.2",
     "@tanstack/react-query": "^5.62.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
@@ -5860,6 +5863,17 @@ Tells the shadcn CLI where to put generated components.
 ```
 
 - [ ] **Step 4: Generate the primitives**
+
+> **CLI version drift — read before running.** `shadcn@latest` (4.21.x and up)
+> generates a different import style than this plan's `components.json`
+> implies: it imports `cn` from a separate npm package named `cn`, pulls
+> Radix primitives from a consolidated `radix-ui` package, and makes
+> `sonner.jsx` depend on `next-themes`. None of those belong here — this app
+> resolves `cn` from `@/lib/utils`, declares individual `@radix-ui/react-*`
+> packages, and toggles dark mode with a class on `<html>` (Task 23), not
+> `next-themes`. Keep the generated component logic, but rewrite the imports
+> to the project's conventions and remove the three stray dependencies the
+> CLI adds to `package.json`.
 
 Run from inside `client/`:
 
