@@ -2578,7 +2578,7 @@ authRouter.post(
 cd server && npx vitest run tests/api/auth.reset.test.js
 ```
 
-Expected: PASS — `10 passed`.
+Expected: PASS — `9 passed`.
 
 - [ ] **Step 7: Run the whole server suite**
 
