@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { env } from './config/env.js';
 import { authRouter } from './features/auth/auth.routes.js';
 import { packagesRouter } from './features/packages/packages.routes.js';
+import { membersRouter } from './features/members/members.routes.js';
 
 /**
  * Builds the Express app without starting a server.
@@ -39,7 +40,8 @@ export const createApp = () => {
 
   app.use('/api/auth', authRouter);
   app.use('/api/packages', packagesRouter);
-  // Feature routers are mounted here as they are built (Tasks 17, 18, 19).
+  app.use('/api/members', membersRouter);
+  // Feature routers are mounted here as they are built (Tasks 18, 19).
 
   app.use(notFoundHandler);
   app.use(errorHandler);
