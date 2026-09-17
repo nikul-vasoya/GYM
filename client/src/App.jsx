@@ -9,6 +9,7 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { MembersPage } from '@/features/members/MembersPage';
 import { MemberDetailPage } from '@/features/members/MemberDetailPage';
 import { ExpiryPage } from '@/features/expiry/ExpiryPage';
+import { ActionRequiredPage } from '@/features/actionRequired/ActionRequiredPage';
 
 export default function App() {
   return (
@@ -26,7 +27,7 @@ export default function App() {
           <Route path="/members" element={<MembersPage />} />
           <Route path="/members/:id" element={<MemberDetailPage />} />
           <Route path="/expiry" element={<ExpiryPage />} />
-          {/* Task 32 adds /action-required */}
+          <Route path="/action-required" element={<ActionRequiredPage />} />
           {/* Task 33 adds /expenses */}
           {/* Task 34 adds /settings */}
         </Route>
