@@ -878,7 +878,6 @@ Tests must never touch Atlas. This harness gives every test run a throwaway in-m
 
 **Files:**
 - Modify: `server/tests/setup.js` (replace the placeholder)
-- Create: `server/tests/helpers/db.js`
 - Test: `server/tests/unit/setup.test.js`
 
 - [ ] **Step 1: Write the failing test**
