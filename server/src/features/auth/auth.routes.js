@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { validate } from '../../middleware/validate.js';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import { asyncHandler } from '../../lib/asyncHandler.js';
-import { loginSchema } from './auth.schema.js';
+import { loginSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schema.js';
 import * as authController from './auth.controller.js';
 
 /** Blunt brute-force brake on the credential endpoints. */
@@ -28,3 +28,17 @@ authRouter.post(
 );
 
 authRouter.get('/me', requireAuth, asyncHandler(authController.me));
+
+authRouter.post(
+  '/forgot-password',
+  authLimiter,
+  validate(forgotPasswordSchema),
+  asyncHandler(authController.forgotPassword),
+);
+
+authRouter.post(
+  '/reset-password',
+  authLimiter,
+  validate(resetPasswordSchema),
+  asyncHandler(authController.resetPassword),
+);
