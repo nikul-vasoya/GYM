@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# logs
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# test output
+coverage/
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

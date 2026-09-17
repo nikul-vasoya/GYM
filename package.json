@@ -1,0 +1,22 @@
+{
+  "name": "gym-management",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gym Management Web Application — member, membership and expense management",
+  "workspaces": ["server", "client"],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "test": "npm run test --workspace server && npm run test --workspace client",
+    "seed": "npm run seed --workspace server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
