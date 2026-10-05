@@ -1,4 +1,4 @@
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, Pencil, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -12,7 +12,7 @@ import { formatDate, formatDaysRemaining } from '@/lib/format';
  * @param {(member) => void} handlers.onView
  * @param {(member) => void} [handlers.onEdit] Omitted on the read-only listings
  */
-export const buildMemberColumns = ({ onView, onEdit }) => [
+export const buildMemberColumns = ({ onView, onEdit, onRenew }) => [
   {
     key: 'srNo',
     header: 'Sr. No.',
@@ -63,7 +63,22 @@ export const buildMemberColumns = ({ onView, onEdit }) => [
     header: 'Action',
     className: 'text-right',
     cell: (member) => (
-      <div className="flex justify-end gap-1">
+      <div className="flex items-center justify-end gap-1">
+        {onRenew && (
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label={`Renew ${member.name}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              onRenew(member);
+            }}
+          >
+            <RefreshCw className="size-4" />
+            Renew
+          </Button>
+        )}
+
         <Button
           variant="ghost"
           size="icon"

@@ -1,8 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { User } from '../../src/models/User.js';
 import { Package } from '../../src/models/Package.js';
 import { Member } from '../../src/models/Member.js';
 import { Expense } from '../../src/models/Expense.js';
+import { createGym } from '../helpers/factories.js';
+
+// Every model below is tenanted, so each test needs a gym to hang it on.
+let gym;
+
+beforeEach(async () => {
+  gym = await createGym();
+});
 
 describe('User model', () => {
   it('lowercases and trims the email', async () => {
@@ -10,6 +18,7 @@ describe('User model', () => {
       name: 'Gym Admin',
       email: '  Admin@Gym.COM ',
       passwordHash: 'hashed',
+      gym: gym._id,
     });
 
     expect(user.email).toBe('admin@gym.com');
@@ -21,6 +30,7 @@ describe('User model', () => {
       email: 'admin@gym.com',
       passwordHash: 'hashed',
       resetTokenHash: 'secret-hash',
+      gym: gym._id,
     });
 
     const json = user.toJSON();
@@ -31,25 +41,95 @@ describe('User model', () => {
   });
 
   it('rejects a duplicate email', async () => {
-    await User.create({ name: 'A', email: 'dup@gym.com', passwordHash: 'x' });
+    await User.create({ name: 'A', email: 'dup@gym.com', passwordHash: 'x', gym: gym._id });
     await User.init();
 
     await expect(
-      User.create({ name: 'B', email: 'dup@gym.com', passwordHash: 'y' }),
+      User.create({ name: 'B', email: 'dup@gym.com', passwordHash: 'y', gym: gym._id }),
     ).rejects.toThrow();
+  });
+
+  it('rejects an email already used at another gym', async () => {
+    const other = await createGym();
+    await User.create({ name: 'A', email: 'shared@gym.com', passwordHash: 'x', gym: gym._id });
+    await User.init();
+
+    // Email is the whole login identity (decision M1), so it is unique across
+    // the platform, not merely within a gym.
+    await expect(
+      User.create({ name: 'B', email: 'shared@gym.com', passwordHash: 'y', gym: other._id }),
+    ).rejects.toThrow();
+  });
+
+  it('requires a gym for a gym account', async () => {
+    await expect(
+      User.create({ name: 'No gym', email: 'nogym@gym.com', passwordHash: 'x', role: 'admin' }),
+    ).rejects.toThrow(/must belong to a gym/i);
+  });
+
+  it('refuses to put a platform superadmin inside a gym', async () => {
+    await expect(
+      User.create({
+        name: 'Platform',
+        email: 'platform@gym.com',
+        passwordHash: 'x',
+        role: 'superadmin',
+        gym: gym._id,
+      }),
+    ).rejects.toThrow(/must not belong to a gym/i);
+  });
+
+  it('allows a superadmin with no gym', async () => {
+    const user = await User.create({
+      name: 'Platform',
+      email: 'platform@gym.com',
+      passwordHash: 'x',
+      role: 'superadmin',
+    });
+
+    expect(user.gym).toBeNull();
   });
 });
 
 describe('Package model', () => {
   it('requires a non-negative price', async () => {
     await expect(
-      Package.create({ name: '1 Month', durationMonths: 1, price: -1 }),
+      Package.create({ gym: gym._id, name: '1 Month', durationMonths: 1, price: -1 }),
     ).rejects.toThrow(/price/i);
   });
 
   it('defaults to active', async () => {
-    const pkg = await Package.create({ name: '1 Month', durationMonths: 1, price: 1500 });
+    const pkg = await Package.create({
+      gym: gym._id,
+      name: '1 Month',
+      durationMonths: 1,
+      price: 1500,
+    });
     expect(pkg.isActive).toBe(true);
+  });
+
+  it('lets two gyms each have a package of the same name', async () => {
+    const other = await createGym();
+    await Package.init();
+
+    await Package.create({ gym: gym._id, name: '3 Months', durationMonths: 3, price: 4000 });
+    const twin = await Package.create({
+      gym: other._id,
+      name: '3 Months',
+      durationMonths: 3,
+      price: 5500,
+    });
+
+    expect(twin.price).toBe(5500);
+  });
+
+  it('rejects the same package name twice within one gym', async () => {
+    await Package.init();
+    await Package.create({ gym: gym._id, name: '3 Months', durationMonths: 3, price: 4000 });
+
+    await expect(
+      Package.create({ gym: gym._id, name: '3 Months', durationMonths: 3, price: 4000 }),
+    ).rejects.toThrow();
   });
 });
 
@@ -57,6 +137,7 @@ describe('Member model', () => {
   const basePackage = { name: '3 Months', durationMonths: 3, price: 4000 };
 
   const buildMember = (overrides = {}) => ({
+    gym: gym._id,
     name: 'Ravi Kumar',
     phone: '9876543210',
     email: 'ravi@example.com',
@@ -70,7 +151,7 @@ describe('Member model', () => {
   });
 
   it('stores a member with a snapshotted package', async () => {
-    const pkg = await Package.create(basePackage);
+    const pkg = await Package.create({ ...basePackage, gym: gym._id });
     const member = await Member.create(buildMember({ package: pkg._id }));
 
     expect(member.packagePrice).toBe(4000);
@@ -94,7 +175,7 @@ describe('Member model', () => {
   });
 
   it('rejects a duplicate email regardless of casing', async () => {
-    const pkg = await Package.create(basePackage);
+    const pkg = await Package.create({ ...basePackage, gym: gym._id });
     await Member.create(buildMember({ package: pkg._id }));
     await Member.init();
 
@@ -103,8 +184,21 @@ describe('Member model', () => {
     ).rejects.toThrow();
   });
 
+  it('lets another gym register the same email and phone', async () => {
+    const other = await createGym();
+    const pkg = await Package.create({ ...basePackage, gym: gym._id });
+    await Member.init();
+
+    await Member.create(buildMember({ package: pkg._id }));
+
+    // Contact details are unique within a gym, not across the platform —
+    // the same person may train at two gyms.
+    const twin = await Member.create(buildMember({ package: pkg._id, gym: other._id }));
+    expect(twin.email).toBe('ravi@example.com');
+  });
+
   it('allows many members with no email at all', async () => {
-    const pkg = await Package.create(basePackage);
+    const pkg = await Package.create({ ...basePackage, gym: gym._id });
     await Member.init();
     await Member.create(buildMember({ package: pkg._id, email: undefined, phone: '9000000001' }));
     await Member.create(
@@ -118,12 +212,13 @@ describe('Member model', () => {
 describe('Expense model', () => {
   it('requires a positive amount', async () => {
     await expect(
-      Expense.create({ date: new Date(), description: 'Dumbbells', amount: 0 }),
+      Expense.create({ gym: gym._id, date: new Date(), description: 'Dumbbells', amount: 0 }),
     ).rejects.toThrow(/amount/i);
   });
 
   it('trims the description', async () => {
     const expense = await Expense.create({
+      gym: gym._id,
       date: new Date('2026-02-10T00:00:00.000Z'),
       description: '  New treadmill  ',
       amount: 45000,

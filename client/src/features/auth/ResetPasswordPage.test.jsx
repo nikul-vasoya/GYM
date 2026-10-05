@@ -49,7 +49,7 @@ describe('ResetPasswordPage', () => {
     renderReset();
 
     await user.type(screen.getByLabelText(/^new password/i), 'short');
-    await user.type(screen.getByLabelText(/confirm/i), 'short');
+    await user.type(screen.getByLabelText(/^confirm/i), 'short');
     await user.click(screen.getByRole('button', { name: /update password/i }));
 
     expect(await screen.findByText(/at least 8 characters/i)).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe('ResetPasswordPage', () => {
     renderReset();
 
     await user.type(screen.getByLabelText(/^new password/i), 'BrandNew1');
-    await user.type(screen.getByLabelText(/confirm/i), 'Different1');
+    await user.type(screen.getByLabelText(/^confirm/i), 'Different1');
     await user.click(screen.getByRole('button', { name: /update password/i }));
 
     expect(await screen.findByText(/do not match/i)).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('ResetPasswordPage', () => {
     renderReset();
 
     await user.type(screen.getByLabelText(/^new password/i), 'BrandNew1');
-    await user.type(screen.getByLabelText(/confirm/i), 'BrandNew1');
+    await user.type(screen.getByLabelText(/^confirm/i), 'BrandNew1');
     await user.click(screen.getByRole('button', { name: /update password/i }));
 
     expect(post).toHaveBeenCalledWith('/auth/reset-password', {
@@ -99,7 +99,7 @@ describe('ResetPasswordPage', () => {
     renderReset();
 
     await user.type(screen.getByLabelText(/^new password/i), 'BrandNew1');
-    await user.type(screen.getByLabelText(/confirm/i), 'BrandNew1');
+    await user.type(screen.getByLabelText(/^confirm/i), 'BrandNew1');
     await user.click(screen.getByRole('button', { name: /update password/i }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/invalid or has expired/i);

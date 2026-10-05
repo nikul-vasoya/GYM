@@ -9,7 +9,9 @@ function Card({
     <div
       data-slot="card"
       className={cn(
-        "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm",
+        // `panel` adds the card surface, the hairline top highlight and the
+        // ambient shadow — the three things that stop a box reading as flat.
+        "panel flex flex-col gap-6 overflow-hidden rounded-2xl border border-border/70 py-6 text-card-foreground",
         className
       )}
       {...props} />
@@ -38,7 +40,7 @@ function CardTitle({
   return (
     <div
       data-slot="card-title"
-      className={cn("leading-none font-semibold", className)}
+      className={cn("font-display leading-none font-semibold", className)}
       {...props} />
   );
 }

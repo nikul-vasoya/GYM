@@ -4,9 +4,11 @@ import { MemberListingPage } from '@/components/shared/MemberListingPage';
 
 export const ActionRequiredPage = () => (
   <MemberListingPage
+    eyebrow="Follow-up"
     title="Action Required"
     description="Memberships approaching expiry — 2 days ahead for 1-month packages, 5 days for 3, 6 and 12-month packages."
     status="expiring-soon"
+    canRenew
     emptyState={{
       icon: PartyPopper,
       title: 'Nothing needs follow-up',

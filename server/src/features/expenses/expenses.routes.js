@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { requireAuth } from '../../middleware/requireAuth.js';
+import { requireAuth, requireGymUser } from '../../middleware/requireAuth.js';
 import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import {
@@ -13,7 +13,7 @@ import * as expensesController from './expenses.controller.js';
 
 export const expensesRouter = Router();
 
-expensesRouter.use(requireAuth);
+expensesRouter.use(requireAuth, requireGymUser);
 
 expensesRouter.get(
   '/',

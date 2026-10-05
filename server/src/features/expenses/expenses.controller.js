@@ -12,9 +12,12 @@ export const list = async (req, res) => {
   const { month } = req.validatedQuery ?? {};
 
   // Half-open range: everything on the last day of the month is included.
+  // Scoped to the caller's gym, like every other read in the app.
   const filter = month
-    ? (({ start, end }) => ({ date: { $gte: start, $lt: end } }))(monthRangeUtc(month))
-    : {};
+    ? (({ start, end }) => ({ gym: req.gymId, date: { $gte: start, $lt: end } }))(
+        monthRangeUtc(month),
+      )
+    : { gym: req.gymId };
 
   const expenses = await Expense.find(filter).sort({ date: -1, createdAt: -1 });
 
@@ -30,14 +33,18 @@ export const list = async (req, res) => {
 };
 
 export const get = async (req, res) => {
-  const expense = await Expense.findById(req.params.id);
+  const expense = await Expense.findOne({ _id: req.params.id, gym: req.gymId });
   if (!expense) throw ApiError.notFound('Expense not found');
 
   res.json({ data: toExpenseResponse(expense) });
 };
 
 export const create = async (req, res) => {
-  const expense = await Expense.create({ ...req.body, date: toUtcMidnight(req.body.date) });
+  const expense = await Expense.create({
+    ...req.body,
+    gym: req.gymId,
+    date: toUtcMidnight(req.body.date),
+  });
 
   res.status(201).json({ data: toExpenseResponse(expense) });
 };
@@ -46,10 +53,11 @@ export const update = async (req, res) => {
   const changes = { ...req.body };
   if (changes.date) changes.date = toUtcMidnight(changes.date);
 
-  const expense = await Expense.findByIdAndUpdate(req.params.id, changes, {
-    new: true,
-    runValidators: true,
-  });
+  const expense = await Expense.findOneAndUpdate(
+    { _id: req.params.id, gym: req.gymId },
+    changes,
+    { new: true, runValidators: true },
+  );
 
   if (!expense) throw ApiError.notFound('Expense not found');
 

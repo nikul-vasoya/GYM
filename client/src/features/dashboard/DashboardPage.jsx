@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useGymPath } from '@/features/branding/useGymPath';
 import {
   Bar,
   BarChart,
@@ -23,13 +24,14 @@ import { getErrorMessage } from '@/lib/api';
 const LoadingTiles = () => (
   <div role="status" aria-label="Loading dashboard" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
     {Array.from({ length: 4 }).map((_, index) => (
-      <Skeleton key={index} className="h-[104px] rounded-xl" />
+      <Skeleton key={index} className="h-[116px] rounded-2xl" />
     ))}
   </div>
 );
 
 export const DashboardPage = () => {
   const { data, isLoading, isError, error } = useDashboardSummary();
+  const to = useGymPath();
 
   if (isError) {
     return (
@@ -37,7 +39,7 @@ export const DashboardPage = () => {
         <PageHeader title="Dashboard" />
         <p
           role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3.5 text-sm text-destructive"
         >
           {getErrorMessage(error)}
         </p>
@@ -59,12 +61,13 @@ export const DashboardPage = () => {
   return (
     <>
       <PageHeader
+        eyebrow="Overview"
         title="Dashboard"
         description="Today's snapshot of memberships and spending."
         actions={
           members.expiringSoon > 0 && (
             <Button asChild variant="outline">
-              <Link to="/action-required">
+              <Link to={to('/action-required')}>
                 <BellRing className="mr-2 size-4" />
                 {members.expiringSoon} need follow-up
               </Link>
@@ -73,7 +76,7 @@ export const DashboardPage = () => {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total members" value={members.total} icon={Users} delay={0} />
         <StatCard
           label="Active"
@@ -98,7 +101,7 @@ export const DashboardPage = () => {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
         <StatCard
           label={`Revenue this month`}
           value={revenue.monthToDate}
@@ -116,15 +119,22 @@ export const DashboardPage = () => {
         />
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-5">
-        <Card className="elevated lg:col-span-3">
+      <div className="mt-8 grid gap-5 lg:grid-cols-5">
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-base">Expenses, last 6 months</CardTitle>
           </CardHeader>
           <CardContent className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={expenseTrend} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
-                <CartesianGrid vertical={false} stroke="var(--color-border)" />
+                <defs>
+                  {/* Bars are lit from the top, like every other gold surface here. */}
+                  <linearGradient id="expense-bar" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--gold-1)" />
+                    <stop offset="100%" stopColor="var(--gold-3)" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="var(--color-border)" strokeOpacity={0.6} />
                 <XAxis
                   dataKey="month"
                   tickLine={false}
@@ -142,22 +152,23 @@ export const DashboardPage = () => {
                   tickFormatter={formatCurrency}
                 />
                 <Tooltip
-                  cursor={{ fill: 'var(--color-muted)' }}
+                  cursor={{ fill: 'var(--color-primary)', fillOpacity: 0.06 }}
                   contentStyle={{
                     background: 'var(--color-popover)',
                     border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-lifted)',
                     color: 'var(--color-popover-foreground)',
                   }}
                   formatter={(value) => [formatCurrency(value), 'Total']}
                 />
-                <Bar dataKey="total" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="total" fill="url(#expense-bar)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="elevated lg:col-span-2">
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-base">Recently added</CardTitle>
           </CardHeader>
@@ -165,10 +176,13 @@ export const DashboardPage = () => {
             {recentMembers.length === 0 ? (
               <EmptyState icon={Users} title="No members yet" description="Add your first member to see them here." />
             ) : (
-              <ul className="divide-y">
+              <ul className="divide-y divide-border/60">
                 {recentMembers.map((member) => (
-                  <li key={member.id} className="flex items-center gap-3 px-6 py-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
+                  <li
+                    key={member.id}
+                    className="flex items-center gap-3 px-6 py-3.5 transition-colors hover:bg-primary/[0.035]"
+                  >
+                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground ring-1 ring-primary/20">
                       {initialsOf(member.name)}
                     </span>
                     <div className="min-w-0 flex-1">

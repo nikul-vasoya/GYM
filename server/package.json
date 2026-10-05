@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "node src/seed/seed.js",
-    "seed:demo": "node src/seed/seedDemoData.js"
+    "seed:demo": "node src/seed/seedDemoData.js",
+    "migrate:multi-gym": "node src/seed/migrateToMultiGym.js",
+    "migrate:branding": "node src/seed/migrateBranding.js",
+    "migrate:mobile-login": "node src/seed/migrateMobileLogin.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.0",
     "morgan": "^1.10.0",
+    "multer": "^2.4.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

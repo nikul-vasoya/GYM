@@ -4,14 +4,18 @@ import { createApp } from '../../src/app.js';
 import { User } from '../../src/models/User.js';
 import { hashPassword } from '../../src/lib/password.js';
 import { hashToken } from '../../src/lib/token.js';
+import { createGym } from '../helpers/factories.js';
 
 const app = createApp();
 
 beforeEach(async () => {
+  const gym = await createGym({ name: 'Iron House' });
+
   await User.create({
     name: 'Gym Admin',
     email: 'admin@gym.com',
     passwordHash: await hashPassword('Admin@123'),
+    gym: gym._id,
   });
 });
 

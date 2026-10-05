@@ -80,9 +80,13 @@ export const buildStatusFilter = (status, today = todayUtc()) => {
  * Search and status each produce a top-level `$or`. Merging them into one
  * object would let the second overwrite the first, silently widening the
  * result — so they are combined under `$and` instead.
+ *
+ * `gym` is always the first clause and always comes from the session, never
+ * from the request: it is what keeps one gym's roster invisible to another.
  */
-export const buildMemberFilter = ({ search, status, packageId, today } = {}) => {
+export const buildMemberFilter = ({ gym, search, status, packageId, today } = {}) => {
   const clauses = [
+    gym ? { gym } : {},
     buildSearchFilter(search),
     buildStatusFilter(status, today),
     packageId ? { package: packageId } : {},

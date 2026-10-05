@@ -1,18 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 
 /* Dark mode is driven by a class on <html>, toggled by ThemeToggle (Task 23). */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Light theme. Every colour in the app comes from one of these tokens —
- * never a raw hex value in a component. Swapping the brand means editing
- * --primary here and in the .dark block, and nothing else.
+ * ────────────────────────────────────────────────────────────────────────
+ *  AURA — the premium theme.
+ *
+ *  Two palettes, one vocabulary. Dark is obsidian + gold; light is ivory +
+ *  antique bronze. Every colour in the app comes from one of these tokens —
+ *  never a raw hex value in a component. Swapping the brand means editing
+ *  --primary and the --gold-* ramp here and in the .dark block, nothing else.
+ * ────────────────────────────────────────────────────────────────────────
  */
+
+/* Light: gallery ivory, warm paper, bronze metal. */
 :root {
   --radius: 0.75rem;
 
-  --background: oklch(0.99 0.002 250);
-  --foreground: oklch(0.21 0.02 255);
+  --font-display: 'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --background: oklch(0.985 0.004 85);
+  --foreground: oklch(0.22 0.012 75);
 
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
@@ -20,86 +31,124 @@
   --popover: oklch(1 0 0);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(0.58 0.19 265);
-  --primary-foreground: oklch(0.99 0.002 250);
+  /* Antique bronze — gold that still carries white text at AA. */
+  --primary: oklch(0.52 0.098 72);
+  --primary-foreground: oklch(0.99 0.004 85);
 
-  --secondary: oklch(0.96 0.008 255);
-  --secondary-foreground: oklch(0.28 0.02 255);
+  --secondary: oklch(0.955 0.008 80);
+  --secondary-foreground: oklch(0.3 0.015 75);
 
-  --muted: oklch(0.96 0.008 255);
-  --muted-foreground: oklch(0.53 0.015 255);
+  --muted: oklch(0.955 0.008 80);
+  --muted-foreground: oklch(0.51 0.014 75);
 
-  --accent: oklch(0.95 0.02 265);
-  --accent-foreground: oklch(0.28 0.03 265);
+  --accent: oklch(0.945 0.022 82);
+  --accent-foreground: oklch(0.32 0.04 72);
 
-  --destructive: oklch(0.58 0.21 25);
-  --destructive-foreground: oklch(0.99 0.002 250);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.99 0.004 85);
 
-  --success: oklch(0.62 0.16 155);
-  --success-foreground: oklch(0.99 0.002 250);
+  --success: oklch(0.52 0.13 155);
+  --success-foreground: oklch(0.99 0.004 85);
 
-  --warning: oklch(0.72 0.16 70);
-  --warning-foreground: oklch(0.21 0.02 255);
+  --warning: oklch(0.58 0.14 55);
+  --warning-foreground: oklch(0.99 0.004 85);
 
-  --border: oklch(0.91 0.01 255);
-  --input: oklch(0.91 0.01 255);
-  --ring: oklch(0.58 0.19 265);
+  --border: oklch(0.9 0.01 80);
+  --input: oklch(0.91 0.01 80);
+  --ring: oklch(0.58 0.11 75);
 
-  --chart-1: oklch(0.58 0.19 265);
-  --chart-2: oklch(0.62 0.16 155);
-  --chart-3: oklch(0.72 0.16 70);
-  --chart-4: oklch(0.58 0.21 25);
-  --chart-5: oklch(0.6 0.13 305);
+  --chart-1: oklch(0.58 0.11 75);
+  --chart-2: oklch(0.55 0.12 155);
+  --chart-3: oklch(0.62 0.13 45);
+  --chart-4: oklch(0.55 0.2 25);
+  --chart-5: oklch(0.52 0.08 250);
 
-  --sidebar: oklch(0.98 0.004 255);
+  --sidebar: oklch(0.975 0.006 82);
   --sidebar-foreground: var(--foreground);
-  --sidebar-border: oklch(0.91 0.01 255);
+  --sidebar-border: oklch(0.9 0.01 80);
+
+  /*
+   * The metal ramp. Buttons, rules and brand marks are built from these
+   * three stops so every gold surface catches the light the same way.
+   */
+  --gold-1: oklch(0.72 0.09 88);
+  --gold-2: oklch(0.56 0.11 76);
+  --gold-3: oklch(0.44 0.09 68);
+  --gold-ink: oklch(0.99 0.004 85);
+
+  /* Ambient wash behind the page, and the glow under raised gold. */
+  --aura: oklch(0.72 0.09 85 / 22%);
+  --gold-glow: oklch(0.56 0.11 76 / 22%);
+
+  /* Hairline: the 1px highlight that separates a panel from a plain box. */
+  --hairline: oklch(1 0 0 / 70%);
+
+  --shadow-ambient: 0 1px 2px -1px oklch(0.3 0.03 75 / 10%), 0 10px 30px -12px oklch(0.3 0.03 75 / 14%);
+  --shadow-lifted: 0 2px 4px -2px oklch(0.3 0.03 75 / 12%), 0 24px 48px -20px oklch(0.3 0.03 75 / 22%);
+
+  color-scheme: light;
 }
 
+/* Dark: obsidian, warm shadow, lit gold. This is the house style. */
 .dark {
-  --background: oklch(0.17 0.015 260);
-  --foreground: oklch(0.96 0.005 255);
+  --background: oklch(0.13 0.006 80);
+  --foreground: oklch(0.95 0.007 85);
 
-  --card: oklch(0.21 0.018 260);
+  --card: oklch(0.165 0.008 80);
   --card-foreground: var(--foreground);
 
-  --popover: oklch(0.21 0.018 260);
+  --popover: oklch(0.185 0.009 80);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(0.68 0.17 265);
-  --primary-foreground: oklch(0.17 0.015 260);
+  --primary: oklch(0.82 0.125 88);
+  --primary-foreground: oklch(0.16 0.02 78);
 
-  --secondary: oklch(0.27 0.02 260);
-  --secondary-foreground: oklch(0.96 0.005 255);
+  --secondary: oklch(0.225 0.01 80);
+  --secondary-foreground: oklch(0.94 0.008 85);
 
-  --muted: oklch(0.27 0.02 260);
-  --muted-foreground: oklch(0.68 0.015 260);
+  --muted: oklch(0.215 0.009 80);
+  --muted-foreground: oklch(0.68 0.014 85);
 
-  --accent: oklch(0.3 0.04 265);
-  --accent-foreground: oklch(0.96 0.005 255);
+  --accent: oklch(0.255 0.022 84);
+  --accent-foreground: oklch(0.93 0.02 86);
 
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.99 0.002 250);
+  --destructive: oklch(0.64 0.19 25);
+  --destructive-foreground: oklch(0.99 0.004 85);
 
-  --success: oklch(0.7 0.15 155);
-  --success-foreground: oklch(0.17 0.015 260);
+  --success: oklch(0.74 0.13 158);
+  --success-foreground: oklch(0.16 0.02 78);
 
-  --warning: oklch(0.78 0.15 70);
-  --warning-foreground: oklch(0.17 0.015 260);
+  --warning: oklch(0.76 0.15 58);
+  --warning-foreground: oklch(0.16 0.02 78);
 
-  --border: oklch(0.3 0.02 260);
-  --input: oklch(0.3 0.02 260);
-  --ring: oklch(0.68 0.17 265);
+  --border: oklch(0.27 0.012 80);
+  --input: oklch(0.24 0.012 80);
+  --ring: oklch(0.82 0.125 88);
 
-  --chart-1: oklch(0.68 0.17 265);
-  --chart-2: oklch(0.7 0.15 155);
-  --chart-3: oklch(0.78 0.15 70);
-  --chart-4: oklch(0.65 0.2 25);
-  --chart-5: oklch(0.7 0.13 305);
+  --chart-1: oklch(0.82 0.125 88);
+  --chart-2: oklch(0.74 0.13 158);
+  --chart-3: oklch(0.72 0.13 45);
+  --chart-4: oklch(0.64 0.19 25);
+  --chart-5: oklch(0.72 0.08 250);
 
-  --sidebar: oklch(0.19 0.017 260);
+  --sidebar: oklch(0.145 0.007 80);
   --sidebar-foreground: var(--foreground);
-  --sidebar-border: oklch(0.28 0.02 260);
+  --sidebar-border: oklch(0.25 0.012 80);
+
+  --gold-1: oklch(0.93 0.09 92);
+  --gold-2: oklch(0.83 0.13 87);
+  --gold-3: oklch(0.66 0.12 76);
+  --gold-ink: oklch(0.16 0.02 78);
+
+  --aura: oklch(0.83 0.13 87 / 16%);
+  --gold-glow: oklch(0.83 0.13 87 / 28%);
+
+  --hairline: oklch(1 0 0 / 8%);
+
+  --shadow-ambient: 0 1px 2px -1px oklch(0 0 0 / 60%), 0 12px 32px -14px oklch(0 0 0 / 70%);
+  --shadow-lifted: 0 2px 6px -2px oklch(0 0 0 / 70%), 0 32px 64px -24px oklch(0 0 0 / 80%);
+
+  color-scheme: dark;
 }
 
 /* Exposes the tokens above as Tailwind utilities: bg-card, text-muted-foreground, … */
@@ -136,10 +185,20 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-border: var(--sidebar-border);
 
+  --color-gold-1: var(--gold-1);
+  --color-gold-2: var(--gold-2);
+  --color-gold-3: var(--gold-3);
+  --color-gold-ink: var(--gold-ink);
+  --color-hairline: var(--hairline);
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
 @layer base {
@@ -147,17 +206,62 @@
     border-color: var(--border);
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-family: var(--font-body);
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings carry the brand voice: geometric, tight, quietly confident. */
+  h1,
+  h2,
+  h3,
+  h4,
+  [data-slot='card-title'],
+  [data-slot='dialog-title'],
+  [data-slot='sheet-title'] {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
   }
 
   /* A visible, consistent focus ring everywhere — keyboard users included. */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+
+  /* Numbers in a ledger line up; that alone reads as considered. */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* A slim, unobtrusive scrollbar rather than the OS default slab. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted-foreground);
   }
 
   /* Respect a reduced-motion preference: animation is polish, never function. */
@@ -172,17 +276,193 @@
   }
 }
 
-@layer utilities {
-  /* The subtle depth that makes cards read as "premium" rather than flat boxes. */
-  .elevated {
-    box-shadow:
-      0 1px 2px -1px rgb(0 0 0 / 0.08),
-      0 4px 16px -4px rgb(0 0 0 / 0.08);
+
+/*
+ * ────────────────────────────────────────────────────────────────────────
+ *  House utilities.
+ *
+ *  Declared with `@utility` rather than `@layer utilities` so Tailwind
+ *  variants compose with them — `hover:elevated-lift`,
+ *  `data-[state=active]:elevated` and so on all generate correctly.
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+/* The subtle depth that makes cards read as "premium" rather than flat boxes. */
+@utility elevated {
+  box-shadow: var(--shadow-ambient);
+}
+
+@utility elevated-lift {
+  box-shadow: var(--shadow-lifted);
+}
+
+/*
+ * A panel: card surface, hairline top highlight, soft shadow. The highlight
+ * is what sells the "milled from one piece" look — without it a dark card is
+ * just a lighter rectangle.
+ */
+@utility panel {
+  position: relative;
+  background-color: var(--card);
+  box-shadow: var(--shadow-ambient);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 1px;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--hairline) 22%,
+      var(--hairline) 78%,
+      transparent
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* Frosted chrome for bars that sit over scrolling content. */
+@utility glass {
+  background-color: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* Brushed-gold fill for the one primary action on a screen. */
+@utility gold-surface {
+  background-image: linear-gradient(
+    135deg,
+    var(--gold-1) 0%,
+    var(--gold-2) 48%,
+    var(--gold-3) 100%
+  );
+  color: var(--gold-ink);
+}
+
+@utility gold-text {
+  background-image: linear-gradient(120deg, var(--gold-1), var(--gold-2) 55%, var(--gold-1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility gold-ring {
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gold-2) 40%, transparent);
+}
+
+@utility gold-glow {
+  box-shadow: 0 8px 28px -10px var(--gold-glow);
+}
+
+/* A hairline rule that fades at both ends — a divider with manners. */
+@utility rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 15%, var(--border) 85%, transparent);
+}
+
+@utility rule-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--gold-2) 70%, transparent),
+    transparent 70%
+  );
+}
+
+/* Small caps micro-label: the typographic tell of a considered interface. */
+@utility eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* The warm light behind everything. Sits in a fixed, aria-hidden layer. */
+@utility aura-wash {
+  background:
+    radial-gradient(48rem 30rem at 50% -8%, var(--aura), transparent 70%),
+    radial-gradient(
+      36rem 26rem at 100% 0%,
+      color-mix(in oklab, var(--aura) 55%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 28rem at 0% 100%,
+      color-mix(in oklab, var(--aura) 40%, transparent),
+      transparent 70%
+    );
+}
+
+/* Film grain — breaks up large flat fields so they don't band. */
+@utility grain {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* A light sweep that crosses a gold button on hover. */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(100deg, transparent 20%, oklch(1 0 0 / 35%) 50%, transparent 80%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
   }
 
-  .dark .elevated {
-    box-shadow:
-      0 1px 2px -1px rgb(0 0 0 / 0.4),
-      0 8px 24px -8px rgb(0 0 0 / 0.5);
+  &:hover::after {
+    transform: translateX(120%);
+  }
+}
+
+/* Loading shimmer, used by Skeleton. */
+@utility shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--foreground) 7%, transparent),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* The slow breathing glow on the status dot. */
+@utility pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--success) 0%, transparent);
   }
 }

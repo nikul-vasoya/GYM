@@ -22,7 +22,7 @@ function TableHeader({
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("bg-secondary/35 dark:bg-secondary/25 [&_tr]:border-b [&_tr]:border-border/70", className)}
       {...props} />
   );
 }
@@ -59,7 +59,7 @@ function TableRow({
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b border-border/60 transition-colors hover:bg-primary/[0.045] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props} />
@@ -74,7 +74,9 @@ function TableHead({
     <th
       data-slot="table-head"
       className={cn(
-        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // Small caps, letterspaced, quiet: a column heading should label the
+        // data without competing with it.
+        "h-11 px-2 text-left align-middle text-[0.6875rem] font-medium tracking-[0.14em] whitespace-nowrap text-muted-foreground uppercase [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props} />

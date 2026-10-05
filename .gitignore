@@ -24,3 +24,6 @@ coverage/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# uploaded files (gym logos)
+server/uploads/

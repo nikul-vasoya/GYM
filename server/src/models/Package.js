@@ -8,7 +8,15 @@ import mongoose from 'mongoose';
  */
 const packageSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true, trim: true },
+    gym: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Gym',
+      required: true,
+      index: true,
+    },
+    name: { type: String, required: true, trim: true, maxlength: 60 },
+    /** Optional note shown to staff when choosing a plan, e.g. "Includes PT". */
+    description: { type: String, trim: true, maxlength: 200, default: null },
     durationMonths: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: [0, 'Package price cannot be negative'] },
     isActive: { type: Boolean, default: true },
@@ -17,6 +25,9 @@ const packageSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+// Package names are unique per gym: every gym gets its own "3 Months".
+packageSchema.index({ gym: 1, name: 1 }, { unique: true });
 
 packageSchema.set('toJSON', {
   virtuals: true,

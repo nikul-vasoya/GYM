@@ -27,7 +27,7 @@ describe('MemberFormDrawer — add', () => {
 
     expect(await screen.findByRole('heading', { name: /add new member/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/mobile number/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/gender/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/package/i)).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('MemberFormDrawer — add', () => {
     renderDrawer();
 
     await user.type(await screen.findByLabelText(/name/i), 'Priya Sharma');
-    await user.type(screen.getByLabelText(/phone number/i), '9811111111');
+    await user.type(screen.getByLabelText(/mobile number/i), '9811111111');
     await user.click(screen.getByLabelText(/gender/i));
     await user.click(await screen.findByRole('option', { name: /female/i }));
     await user.click(screen.getByLabelText(/package/i));

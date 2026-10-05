@@ -1,63 +1,47 @@
-import { Package } from '../models/Package.js';
 import { User } from '../models/User.js';
 import { hashPassword } from '../lib/password.js';
 import { connectDatabase, disconnectDatabase } from '../config/db.js';
 import { env } from '../config/env.js';
+import { ensureSystemThemes, SYSTEM_THEMES } from '../lib/systemThemes.js';
+
+// Re-exported so the gym provisioning path and the seeds agree on one list.
+export { DEFAULT_PACKAGES, createDefaultPackages } from '../lib/defaultPackages.js';
 
 /**
- * Placeholder prices (decision D4). The client confirms the real figures and
- * edits them from Settings — no code change needed.
- */
-export const DEFAULT_PACKAGES = [
-  { name: '1 Month', durationMonths: 1, price: 1500, sortOrder: 1 },
-  { name: '3 Months', durationMonths: 3, price: 4000, sortOrder: 2 },
-  { name: '6 Months', durationMonths: 6, price: 7500, sortOrder: 3 },
-  { name: '12 Months', durationMonths: 12, price: 14000, sortOrder: 4 },
-];
-
-/** Static accounts for testing and the client demo (SRS §1.3). */
-export const DEMO_USERS = [
-  { name: 'Gym Admin', email: 'admin@gym.com', password: 'Admin@123', role: 'admin' },
-  { name: 'Front Desk', email: 'staff@gym.com', password: 'Staff@123', role: 'staff' },
-];
-
-/**
- * Inserts any missing packages.
+ * The platform operator's account.
  *
- * Deliberately does NOT update existing rows — an admin's edited price must
- * survive a re-seed.
+ * This is the only account the seed creates. Gyms — and every gym admin and
+ * staff account — are created from the platform screen at `/admin-login`,
+ * never from a seed, so no gym ever exists without an owner who asked for it.
+ *
+ * Credentials come from the environment when set, so a real deployment never
+ * has to ship with the documented default.
  */
-export const seedPackages = async () => {
-  const created = [];
+export const superadminDefinition = () => ({
+  name: process.env.SUPERADMIN_NAME ?? 'Platform Admin',
+  email: (process.env.SUPERADMIN_EMAIL ?? 'superadmin@platform.com').toLowerCase(),
+  password: process.env.SUPERADMIN_PASSWORD ?? 'Super@123',
+});
 
-  for (const definition of DEFAULT_PACKAGES) {
-    const existing = await Package.findOne({ name: definition.name });
-    if (existing) continue;
-    created.push(await Package.create(definition));
-  }
+/**
+ * Creates the superadmin if it is missing.
+ *
+ * Idempotent, and never touches an existing password — re-running the seed
+ * after the operator has changed their own password must not undo that.
+ */
+export const seedSuperadmin = async () => {
+  const definition = superadminDefinition();
 
-  return created;
-};
+  const existing = await User.findOne({ email: definition.email });
+  if (existing) return null;
 
-/** Inserts any missing demo accounts, never touching an existing password. */
-export const seedUsers = async () => {
-  const created = [];
-
-  for (const definition of DEMO_USERS) {
-    const existing = await User.findOne({ email: definition.email });
-    if (existing) continue;
-
-    created.push(
-      await User.create({
-        name: definition.name,
-        email: definition.email,
-        role: definition.role,
-        passwordHash: await hashPassword(definition.password),
-      }),
-    );
-  }
-
-  return created;
+  return User.create({
+    name: definition.name,
+    email: definition.email,
+    role: 'superadmin',
+    gym: null,
+    passwordHash: await hashPassword(definition.password),
+  });
 };
 
 /** CLI entry point: `npm run seed`. */
@@ -65,18 +49,19 @@ const runFromCli = async () => {
   const config = env();
   await connectDatabase(config.mongodbUri);
 
-  const packages = await seedPackages();
-  const users = await seedUsers();
+  await ensureSystemThemes();
+  console.log(`[seed] ${SYSTEM_THEMES.length} built-in themes are in place.`);
 
-  console.log(`[seed] packages created: ${packages.length}`);
-  console.log(`[seed] users created: ${users.length}`);
+  const created = await seedSuperadmin();
+  const definition = superadminDefinition();
 
-  if (users.length > 0) {
-    console.log('[seed] demo credentials:');
-    for (const user of DEMO_USERS) {
-      console.log(`  ${user.email} / ${user.password}`);
-    }
-    console.log('[seed] change these before the app handles real data.');
+  if (created) {
+    console.log('[seed] platform administrator created:');
+    console.log(`  ${definition.email} / ${definition.password}`);
+    console.log('[seed] sign in at /admin-login and create your first gym.');
+    console.log('[seed] change this password before the app handles real data.');
+  } else {
+    console.log(`[seed] platform administrator already exists: ${definition.email}`);
   }
 
   await disconnectDatabase();

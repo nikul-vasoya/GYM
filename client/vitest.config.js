@@ -10,11 +10,21 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.js'],
     css: false,
-    // Opening a Radix dropdown/menu via `userEvent` has been observed taking
-    // 15-30 real seconds on this dev machine (timer delivery contention from
-    // other running processes), well past Vitest's 5s default. The default
-    // testTimeout is raised so genuinely-passing interaction tests don't fail
-    // spuriously; it does not change what the tests assert.
-    testTimeout: 45000,
+    /*
+     * Opening a Radix dropdown menu under jsdom costs ~35 real seconds here,
+     * and the whole of it is spent synchronously inside `userEvent.click`.
+     * It reproduces with a bare DropdownMenu and no application code, so it
+     * is the environment, not anything this app does. Measured and ruled out:
+     * the rAF override in `src/test/setup.js` (no rAF callbacks are scheduled
+     * at all), raw `setTimeout` latency (10 timers in 12ms), userEvent's
+     * inter-event `delay`, its `pointerEventsCheck`, `modal` mode, and the
+     * `findBy*` queries themselves (5-12ms).
+     *
+     * The timeout is generous so that the handful of menu-driven tests pass
+     * reliably rather than sitting a second under the limit. It does not
+     * change what any test asserts. Worth revisiting on a Radix or jsdom
+     * upgrade — only three tests pay this cost.
+     */
+    testTimeout: 120000,
   },
 });

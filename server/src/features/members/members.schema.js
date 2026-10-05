@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MEMBERSHIP_STATUS } from '../../lib/membership.js';
+import { normalizePhone } from '../../lib/phone.js';
 
 const objectId = (message) => z.string().regex(/^[0-9a-fA-F]{24}$/, message);
 
@@ -7,7 +8,7 @@ const objectId = (message) => z.string().regex(/^[0-9a-fA-F]{24}$/, message);
 const phoneField = z
   .string()
   .trim()
-  .regex(/^\+?[0-9][0-9\s()-]{6,19}$/, 'Enter a valid phone number');
+  .regex(/^\+?[0-9][0-9\s()-]{6,19}$/, 'Enter a valid mobile number');
 
 /** An empty string from an untouched optional input means "no value". */
 const optionalText = (schema) =>
@@ -29,7 +30,12 @@ export const createMemberSchema = z
       .trim()
       .min(2, 'Name must be at least 2 characters')
       .max(80, 'Name must be 80 characters or fewer'),
-    phone: optionalText(phoneField),
+    phone: z
+      .string({ required_error: 'Mobile number is required' })
+      .trim()
+      .min(1, 'Mobile number is required')
+      .pipe(phoneField)
+      .transform(normalizePhone),
     email: optionalText(emailField),
     gender: z.enum(['male', 'female', 'other'], {
       errorMap: () => ({ message: 'Select a gender' }),

@@ -23,20 +23,26 @@ export const summary = async (req, res) => {
   const today = todayUtc();
   const thisMonth = monthKey(today);
   const { start: monthStart, end: monthEnd } = monthRangeUtc(thisMonth);
+  const gym = req.gymId;
+
+  // Every count below is narrowed to the caller's gym. A status filter is
+  // merged under $and rather than spread, because it can itself carry a
+  // top-level $or that a spread would silently drop.
+  const scopedStatus = (status) => ({ $and: [{ gym }, buildStatusFilter(status, today)] });
 
   const [total, active, expiringSoon, expired] = await Promise.all([
-    Member.countDocuments(),
-    Member.countDocuments(buildStatusFilter(MEMBERSHIP_STATUS.ACTIVE, today)),
-    Member.countDocuments(buildStatusFilter(MEMBERSHIP_STATUS.EXPIRING_SOON, today)),
-    Member.countDocuments(buildStatusFilter(MEMBERSHIP_STATUS.EXPIRED, today)),
+    Member.countDocuments({ gym }),
+    Member.countDocuments(scopedStatus(MEMBERSHIP_STATUS.ACTIVE)),
+    Member.countDocuments(scopedStatus(MEMBERSHIP_STATUS.EXPIRING_SOON)),
+    Member.countDocuments(scopedStatus(MEMBERSHIP_STATUS.EXPIRED)),
   ]);
 
   const [monthExpenses, monthMemberships, recentMembers, trendRows] = await Promise.all([
-    Expense.find({ date: { $gte: monthStart, $lt: monthEnd } }),
-    Member.find({ startDate: { $gte: monthStart, $lt: monthEnd } }).select('packagePrice'),
-    Member.find().sort({ createdAt: -1 }).limit(RECENT_MEMBER_COUNT),
+    Expense.find({ gym, date: { $gte: monthStart, $lt: monthEnd } }),
+    Member.find({ gym, startDate: { $gte: monthStart, $lt: monthEnd } }).select('packagePrice'),
+    Member.find({ gym }).sort({ createdAt: -1 }).limit(RECENT_MEMBER_COUNT),
     Expense.aggregate([
-      { $match: { date: { $gte: monthRangeUtc(recentMonthKeys(today)[0]).start } } },
+      { $match: { gym, date: { $gte: monthRangeUtc(recentMonthKeys(today)[0]).start } } },
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m', date: '$date', timezone: 'UTC' } },

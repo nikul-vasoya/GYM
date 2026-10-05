@@ -77,6 +77,7 @@ export const ExpensesPage = () => {
   return (
     <>
       <PageHeader
+        eyebrow="Ledger"
         title="Expenses"
         description="Gym running costs, filtered by month."
         actions={
@@ -87,15 +88,16 @@ export const ExpensesPage = () => {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <MonthPicker value={month} onChange={setMonth} />
 
-        <Card className="elevated">
-          <CardContent className="flex items-baseline gap-3 px-4 py-2.5">
-            <span className="text-sm text-muted-foreground">
+        <Card className="py-0">
+          <CardContent className="flex items-center gap-4 px-5 py-3">
+            <span className="eyebrow">
               {summary.count} expense{summary.count === 1 ? '' : 's'}
             </span>
-            <span className="text-lg font-semibold tabular-nums">
+            <span aria-hidden className="h-5 w-px bg-border" />
+            <span className="font-display text-lg font-semibold tabular-nums">
               {formatCurrency(summary.total)}
             </span>
           </CardContent>

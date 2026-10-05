@@ -13,6 +13,10 @@ export default defineConfig({
     port: 5173,
     // The client calls '/api/...' in both dev and production, so no base URL
     // juggling and no CORS surprises during development.
-    proxy: { '/api': { target: 'http://localhost:4000', changeOrigin: true } },
+    // `/uploads` carries gym logos, served by the API alongside it.
+    proxy: {
+      '/api': { target: 'http://localhost:4000', changeOrigin: true },
+      '/uploads': { target: 'http://localhost:4000', changeOrigin: true },
+    },
   },
 });

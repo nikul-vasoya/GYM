@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -72,5 +72,58 @@ describe('SettingsPage', () => {
     expect(
       await screen.findByText(/existing members keep the price they were charged/i),
     ).toBeInTheDocument();
+  });
+
+  it('adds a new plan', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue({
+      data: { data: { id: 'p9', name: 'Summer Special', durationMonths: 2, price: 2500, isActive: true } },
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<SettingsPage />);
+
+    await user.click(await screen.findByRole('button', { name: /new plan/i }));
+    const dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByLabelText(/plan name/i), 'Summer Special');
+    const months = within(dialog).getByLabelText(/duration/i);
+    await user.clear(months);
+    await user.type(months, '2');
+    await user.type(within(dialog).getByLabelText(/^price/i), '2500');
+    await user.click(within(dialog).getByRole('button', { name: /add plan/i }));
+
+    await waitFor(() => {
+      expect(post).toHaveBeenCalledWith('/packages', {
+        name: 'Summer Special',
+        durationMonths: 2,
+        price: 2500,
+        description: '',
+        isActive: true,
+      });
+    });
+  });
+
+  it('switches a plan off', async () => {
+    const patch = vi
+      .spyOn(api, 'patch')
+      .mockResolvedValue({ data: { data: { ...packages[0], isActive: false } } });
+    const user = userEvent.setup();
+    renderWithProviders(<SettingsPage />);
+
+    const toggle = await screen.findByRole('switch', { name: /1 month available to sell/i });
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+    await user.click(toggle);
+
+    await waitFor(() => expect(patch).toHaveBeenCalledWith('/packages/p1', { isActive: false }));
+  });
+
+  it('asks before deleting a plan', async () => {
+    const remove = vi.spyOn(api, 'delete').mockResolvedValue({});
+    const user = userEvent.setup();
+    renderWithProviders(<SettingsPage />);
+
+    await user.click(await screen.findByRole('button', { name: /delete 1 month/i }));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: /delete plan/i }));
+
+    await waitFor(() => expect(remove).toHaveBeenCalledWith('/packages/p1'));
   });
 });

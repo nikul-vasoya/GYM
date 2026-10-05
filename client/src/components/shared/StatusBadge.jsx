@@ -8,7 +8,9 @@ export const StatusBadge = ({ status }) => {
   if (!meta) return null;
 
   return (
-    <Badge variant="outline" className={cn('font-medium', meta.className)}>
+    <Badge variant="outline" className={cn('gap-1.5 py-1 pl-2 font-medium', meta.className)}>
+      {/* The dot carries the colour so the label can stay quiet. */}
+      <span aria-hidden className={cn('size-1.5 rounded-full', meta.dotClassName)} />
       {meta.label}
     </Badge>
   );

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useGymPath } from '@/features/branding/useGymPath';
 import { ArrowLeft, Pencil, RefreshCw } from 'lucide-react';
 
 import { PageHeader } from '@/components/shared/PageHeader';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
@@ -16,14 +17,15 @@ import { getErrorMessage } from '@/lib/api';
 
 const DetailRow = ({ label, children }) => (
   <div className="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
-    <dt className="text-sm text-muted-foreground">{label}</dt>
-    <dd className="text-sm font-medium">{children}</dd>
+    <dt className="eyebrow">{label}</dt>
+    <dd className="text-sm font-medium tabular-nums">{children}</dd>
   </div>
 );
 
 export const MemberDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const to = useGymPath();
   const { data: member, isLoading, isError, error } = useMember(id);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRenewOpen, setIsRenewOpen] = useState(false);
@@ -34,11 +36,11 @@ export const MemberDetailPage = () => {
         <PageHeader title="Member" />
         <p
           role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3.5 text-sm text-destructive"
         >
           {getErrorMessage(error)}
         </p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/members')}>
+        <Button variant="outline" className="mt-4" onClick={() => navigate(to('/members'))}>
           <ArrowLeft className="mr-2 size-4" />
           Back to members
         </Button>
@@ -49,8 +51,8 @@ export const MemberDetailPage = () => {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-9 w-56" />
-        <Skeleton className="h-64 rounded-xl" />
+        <Skeleton className="h-10 w-56" />
+        <Skeleton className="h-64 rounded-2xl" />
       </div>
     );
   }
@@ -58,14 +60,15 @@ export const MemberDetailPage = () => {
   return (
     <>
       <Link
-        to="/members"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        to={to('/members')}
+        className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
       >
         <ArrowLeft className="size-4" />
         Back to members
       </Link>
 
       <PageHeader
+        eyebrow="Member profile"
         title={member.name}
         description={`${member.packageName} · ${formatDaysRemaining(member.daysRemaining)}`}
         actions={
@@ -82,14 +85,16 @@ export const MemberDetailPage = () => {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="elevated">
-          <CardHeader className="flex-row items-center justify-between space-y-0">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
             <CardTitle className="text-base">Current membership</CardTitle>
-            <StatusBadge status={member.status} />
+            <CardAction>
+              <StatusBadge status={member.status} />
+            </CardAction>
           </CardHeader>
           <CardContent>
-            <dl className="divide-y">
+            <dl className="divide-y divide-border/60">
               <DetailRow label="Package">{member.packageName}</DetailRow>
               <DetailRow label="Price">{formatCurrency(member.packagePrice)}</DetailRow>
               <DetailRow label="Duration">{member.durationMonths} months</DetailRow>
@@ -100,12 +105,12 @@ export const MemberDetailPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="elevated">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">Contact details</CardTitle>
           </CardHeader>
           <CardContent>
-            <dl className="divide-y">
+            <dl className="divide-y divide-border/60">
               <DetailRow label="Phone">{member.phone || '—'}</DetailRow>
               <DetailRow label="Email">{member.email || '—'}</DetailRow>
               <DetailRow label="Gender">
@@ -115,7 +120,7 @@ export const MemberDetailPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="elevated lg:col-span-2">
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-base">Membership history</CardTitle>
           </CardHeader>

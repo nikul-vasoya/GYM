@@ -23,7 +23,7 @@ export const ConfirmDialog = ({
         <DialogTitle>{title}</DialogTitle>
         {description && <DialogDescription>{description}</DialogDescription>}
       </DialogHeader>
-      <DialogFooter className="gap-2 sm:gap-2">
+      <DialogFooter className="gap-2.5 pt-2 sm:gap-2.5">
         <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
           Cancel
         </Button>

@@ -4,7 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="Member, membership and expense management for your gym." />
+    <!-- Fonts are requested from index.css; preconnecting shaves a round trip. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Gym Management</title>
+    <script>
+      // Runs before paint: the toggle lives in the app shell, but the login
+      // screen has no toggle and must still respect a saved preference.
+      (function () {
+        try {
+          var stored = localStorage.getItem('gym.theme');
+          var theme =
+            stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+        } catch (error) {
+          /* Private mode or blocked storage: the markup default stands. */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

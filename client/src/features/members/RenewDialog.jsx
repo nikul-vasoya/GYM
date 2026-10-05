@@ -52,7 +52,7 @@ export const RenewDialog = ({ open, onOpenChange, member }) => {
         <FormField label="Package">
           {(field) => (
             <Select value={packageId} onValueChange={setPackageId}>
-              <SelectTrigger {...field}>
+              <SelectTrigger {...field} className="w-full">
                 <SelectValue placeholder="Select package" />
               </SelectTrigger>
               <SelectContent>
@@ -66,7 +66,7 @@ export const RenewDialog = ({ open, onOpenChange, member }) => {
           )}
         </FormField>
 
-        <DialogFooter className="gap-2 sm:gap-2">
+        <DialogFooter className="gap-2.5 pt-2 sm:gap-2.5">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

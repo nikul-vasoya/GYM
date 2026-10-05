@@ -42,26 +42,50 @@ export const StatCard = ({ label, value, icon: Icon, tone = 'default', format, d
   const shown = format ? format(counted) : counted;
 
   const tones = {
-    default: 'bg-primary/10 text-primary',
-    success: 'bg-success/10 text-success',
-    warning: 'bg-warning/10 text-warning',
-    destructive: 'bg-destructive/10 text-destructive',
+    default: 'bg-primary/12 text-primary ring-primary/20',
+    success: 'bg-success/12 text-success ring-success/20',
+    warning: 'bg-warning/12 text-warning ring-warning/20',
+    destructive: 'bg-destructive/12 text-destructive ring-destructive/20',
+  };
+
+  const glows = {
+    default: 'from-primary/12',
+    success: 'from-success/12',
+    warning: 'from-warning/12',
+    destructive: 'from-destructive/12',
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay }}
+      transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3 }}
     >
-      <Card className="elevated">
-        <CardContent className="flex items-center justify-between gap-4 p-5">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-2xl font-semibold tracking-tight tabular-nums">{shown}</p>
+      <Card className="group h-full transition-shadow duration-300 hover:elevated-lift">
+        {/* Corner light, tinted to the tile's tone. Purely atmospheric. */}
+        <div
+          aria-hidden
+          className={cn(
+            'pointer-events-none absolute -top-16 -right-10 size-40 rounded-full bg-gradient-to-br to-transparent opacity-70 blur-2xl transition-opacity duration-300 group-hover:opacity-100',
+            glows[tone],
+          )}
+        />
+
+        <CardContent className="relative flex items-center justify-between gap-4 px-5 py-1">
+          <div className="min-w-0 space-y-1.5">
+            <p className="eyebrow truncate">{label}</p>
+            <p className="font-display text-[1.75rem] leading-none font-semibold tracking-tight tabular-nums">
+              {shown}
+            </p>
           </div>
           {Icon && (
-            <span className={cn('grid size-11 shrink-0 place-items-center rounded-xl', tones[tone])}>
+            <span
+              className={cn(
+                'grid size-12 shrink-0 place-items-center rounded-xl ring-1 transition-transform duration-300 group-hover:scale-105',
+                tones[tone],
+              )}
+            >
               <Icon className="size-5" />
             </span>
           )}

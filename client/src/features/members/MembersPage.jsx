@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGymPath } from '@/features/branding/useGymPath';
 import { Plus, Search, Users } from 'lucide-react';
 
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -23,6 +24,7 @@ const ALL_STATUSES = 'all';
 
 export const MembersPage = () => {
   const navigate = useNavigate();
+  const to = useGymPath();
 
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
@@ -51,13 +53,13 @@ export const MembersPage = () => {
   const columns = useMemo(
     () =>
       buildMemberColumns({
-        onView: (member) => navigate(`/members/${member.id}`),
+        onView: (member) => navigate(to(`/members/${member.id}`)),
         onEdit: (member) => {
           setEditingMember(member);
           setIsFormOpen(true);
         },
       }),
-    [navigate],
+    [navigate, to],
   );
 
   const openAddForm = () => {
@@ -71,6 +73,7 @@ export const MembersPage = () => {
   return (
     <>
       <PageHeader
+        eyebrow="Directory"
         title="Members"
         description="Everyone registered at the gym."
         actions={
@@ -81,14 +84,14 @@ export const MembersPage = () => {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[240px] flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             aria-label="Search members"
             placeholder="Search by name, phone or email…"
-            className="pl-9"
+            className="pl-10"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
           />
@@ -101,7 +104,7 @@ export const MembersPage = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-[180px]" aria-label="Filter by status">
+          <SelectTrigger className="w-[190px]" aria-label="Filter by status">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -120,7 +123,7 @@ export const MembersPage = () => {
         startIndex={(page - 1) * PAGE_SIZE}
         pagination={data?.pagination}
         onPageChange={setPage}
-        onRowClick={(member) => navigate(`/members/${member.id}`)}
+        onRowClick={(member) => navigate(to(`/members/${member.id}`))}
         emptyState={
           <EmptyState
             icon={Users}

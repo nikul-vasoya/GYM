@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Gym Management Web Application — member, membership and expense management",
-  "workspaces": ["server", "client"],
+  "description": "Gym Management Web Application \u2014 member, membership and expense management",
+  "workspaces": [
+    "server",
+    "client"
+  ],
   "engines": {
     "node": ">=20.19"
   },
@@ -14,7 +17,10 @@
     "dev:client": "npm run dev --workspace client",
     "build": "npm run build --workspace client",
     "test": "npm run test --workspace server && npm run test --workspace client",
-    "seed": "npm run seed --workspace server"
+    "seed": "npm run seed --workspace server",
+    "migrate:multi-gym": "npm run migrate:multi-gym --workspace server",
+    "migrate:branding": "npm run migrate:branding --workspace server",
+    "migrate:mobile-login": "npm run migrate:mobile-login --workspace server"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

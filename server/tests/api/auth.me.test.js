@@ -4,16 +4,21 @@ import jwt from 'jsonwebtoken';
 import { createApp } from '../../src/app.js';
 import { User } from '../../src/models/User.js';
 import { hashPassword } from '../../src/lib/password.js';
+import { createGym } from '../helpers/factories.js';
 
 const app = createApp();
 let token;
 let user;
+let gym;
 
 beforeEach(async () => {
+  gym = await createGym({ name: 'Iron House' });
+
   user = await User.create({
     name: 'Gym Admin',
     email: 'admin@gym.com',
     passwordHash: await hashPassword('Admin@123'),
+    gym: gym._id,
   });
 
   const response = await request(app)
@@ -32,6 +37,7 @@ describe('GET /api/auth/me', () => {
     expect(response.status).toBe(200);
     expect(response.body.user.email).toBe('admin@gym.com');
     expect(response.body.user.passwordHash).toBeUndefined();
+    expect(response.body.gym).toMatchObject({ id: gym.id, name: 'Iron House' });
   });
 
   it('rejects a request with no Authorization header', async () => {

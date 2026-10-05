@@ -86,7 +86,7 @@ export const ExpenseFormDialog = ({ open, onOpenChange, expense }) => {
           <DialogDescription>Record a gym running cost.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           {formError && (
             <p role="alert" className="text-sm font-medium text-destructive">
               {formError}
@@ -117,7 +117,7 @@ export const ExpenseFormDialog = ({ open, onOpenChange, expense }) => {
             )}
           </FormField>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2.5 pt-2 sm:gap-2.5">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

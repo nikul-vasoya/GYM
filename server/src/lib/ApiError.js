@@ -22,7 +22,7 @@ export class ApiError extends Error {
     return new ApiError(400, message, details);
   }
 
-  static unauthorized(message = 'Invalid email or password') {
+  static unauthorized(message = 'Invalid mobile number, email or password') {
     return new ApiError(401, message);
   }
 
@@ -30,7 +30,7 @@ export class ApiError extends Error {
     return new ApiError(404, message);
   }
 
-  static conflict(message) {
-    return new ApiError(409, message);
+  static conflict(message, details) {
+    return new ApiError(409, message, details);
   }
 }

@@ -5,7 +5,8 @@ import { Member } from '../models/Member.js';
 import { Expense } from '../models/Expense.js';
 import { calculateEndDate } from '../lib/membership.js';
 import { addDaysUtc, addMonthsUtc, todayUtc, toIsoDate } from '../lib/dates.js';
-import { seedPackages } from './seed.js';
+import { Gym } from '../models/Gym.js';
+import { createDefaultPackages } from '../lib/defaultPackages.js';
 
 const NAMES = [
   'Priya Sharma', 'Rahul Verma', 'Anita Desai', 'Vikram Singh', 'Meera Nair',
@@ -24,13 +25,26 @@ const GENDERS = ['female', 'male', 'female', 'male', 'other'];
  */
 const run = async () => {
   await connectDatabase(env().mongodbUri);
-  await seedPackages();
 
-  const packages = await Package.find().sort({ sortOrder: 1 });
+  // Demo data belongs to one gym. Pick it by slug when given, otherwise the
+  // oldest — there is no sensible "all gyms" meaning for this script.
+  const slug = process.env.DEMO_GYM_SLUG;
+  const gym = slug ? await Gym.findOne({ slug }) : await Gym.findOne().sort({ createdAt: 1 });
+
+  if (!gym) {
+    throw new Error(
+      'No gym found. Sign in at /admin-login and create one first, or run the migration.',
+    );
+  }
+
+  await createDefaultPackages(gym._id);
+
+  const packages = await Package.find({ gym: gym._id }).sort({ sortOrder: 1 });
   const today = todayUtc();
 
-  await Member.deleteMany({});
-  await Expense.deleteMany({});
+  // Scoped deletes: seeding one gym's demo data must not wipe another's.
+  await Member.deleteMany({ gym: gym._id });
+  await Expense.deleteMany({ gym: gym._id });
 
   for (const [index, name] of NAMES.entries()) {
     const pkg = packages[index % packages.length];
@@ -43,6 +57,7 @@ const run = async () => {
     const startDate = addDaysUtc(addMonthsUtc(endDate, -pkg.durationMonths), 1);
 
     await Member.create({
+      gym: gym._id,
       name,
       phone: `98${String(10000000 + index).padStart(8, '0')}`,
       email: `${name.split(' ')[0].toLowerCase()}${index}@example.com`,
@@ -68,6 +83,7 @@ const run = async () => {
   for (let monthsAgo = 0; monthsAgo < 6; monthsAgo += 1) {
     for (const [description, amount] of EXPENSES.slice(0, 3 + (monthsAgo % 3))) {
       await Expense.create({
+        gym: gym._id,
         date: addMonthsUtc(today, -monthsAgo),
         description,
         amount,
@@ -75,7 +91,10 @@ const run = async () => {
     }
   }
 
-  console.log(`[seed:demo] ${NAMES.length} members and expenses created up to ${toIsoDate(today)}`);
+  console.log(
+    `[seed:demo] ${NAMES.length} members and expenses created for "${gym.name}" ` +
+      `up to ${toIsoDate(today)}`,
+  );
   await disconnectDatabase();
 };
 

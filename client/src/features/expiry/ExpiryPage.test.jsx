@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
 
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -63,5 +64,22 @@ describe('ExpiryPage', () => {
     renderExpiry();
 
     expect(await screen.findByText(/no expired memberships/i)).toBeInTheDocument();
+  });
+
+  it('renews a member straight from the list, without opening their page', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue({
+      data: { data: { ...expired, endDate: '2026-12-31', status: 'active' } },
+    });
+    const user = userEvent.setup();
+    renderExpiry();
+
+    await user.click(await screen.findByRole('button', { name: /renew lapsed member/i }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/renew membership/i)).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: /confirm renewal/i }));
+
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/members/m1/renew', {}));
+    expect(screen.queryByRole('heading', { name: 'Member detail' })).not.toBeInTheDocument();
   });
 });

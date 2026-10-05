@@ -15,9 +15,12 @@ export const FormField = ({ label, error, hint, required, className, children })
 
   return (
     <div className={cn('space-y-2', className)}>
-      <Label htmlFor={id}>
+      <Label
+        htmlFor={id}
+        className="text-[0.6875rem] font-medium tracking-[0.14em] text-muted-foreground uppercase"
+      >
         {label}
-        {required && <span className="ml-0.5 text-destructive">*</span>}
+        {required && <span className="ml-0.5 text-primary">*</span>}
       </Label>
 
       {children({

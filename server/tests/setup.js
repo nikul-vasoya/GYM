@@ -2,6 +2,8 @@ import { beforeAll, afterAll, afterEach } from 'vitest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
+import { resetDefaultGym } from './helpers/factories.js';
+
 // Set before any application module reads the environment.
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-that-is-definitely-long-enough-32';
@@ -26,8 +28,11 @@ beforeAll(async () => {
   await mongoose.connect(process.env.MONGODB_URI);
 });
 
-// A clean database between tests means test order can never matter.
+// A clean database between tests means test order can never matter. The
+// factories' default gym is part of that state, so it is cleared here too.
 afterEach(async () => {
+  resetDefaultGym();
+
   const { collections } = mongoose.connection;
   await Promise.all(
     Object.values(collections).map((collection) => collection.deleteMany({})),

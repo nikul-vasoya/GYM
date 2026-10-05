@@ -12,9 +12,14 @@ const SORT_OPTIONS = {
   endDate: { endDate: 1 },
 };
 
-/** Loads a package for sale, rejecting unknown or retired ones. */
-const loadSellablePackage = async (packageId) => {
-  const pkg = await Package.findById(packageId);
+/**
+ * Loads a package for sale, rejecting unknown or retired ones.
+ *
+ * Scoped to the gym, so a package id belonging to another gym is "not found"
+ * rather than quietly sellable at that gym's price.
+ */
+const loadSellablePackage = async (gymId, packageId) => {
+  const pkg = await Package.findOne({ _id: packageId, gym: gymId });
   if (!pkg) throw ApiError.notFound('Package not found');
   if (!pkg.isActive) throw ApiError.badRequest('That package is no longer available');
   return pkg;
@@ -28,8 +33,8 @@ const snapshotOf = (pkg) => ({
   durationMonths: pkg.durationMonths,
 });
 
-export const listMembers = async ({ search, status, packageId, page, limit, sort }) => {
-  const filter = buildMemberFilter({ search, status, packageId });
+export const listMembers = async (gymId, { search, status, packageId, page, limit, sort }) => {
+  const filter = buildMemberFilter({ gym: gymId, search, status, packageId });
 
   const [members, total] = await Promise.all([
     Member.find(filter)
@@ -45,8 +50,8 @@ export const listMembers = async ({ search, status, packageId, page, limit, sort
   };
 };
 
-export const getMember = async (id) => {
-  const member = await Member.findById(id);
+export const getMember = async (gymId, id) => {
+  const member = await Member.findOne({ _id: id, gym: gymId });
   if (!member) throw ApiError.notFound('Member not found');
   return member;
 };
@@ -57,12 +62,13 @@ export const getMember = async (id) => {
  * The price and end date are always derived — never taken from the request —
  * so the client cannot sell a membership at the wrong price.
  */
-export const createMember = async ({ packageId, startDate, ...details }) => {
-  const pkg = await loadSellablePackage(packageId);
+export const createMember = async (gymId, { packageId, startDate, ...details }) => {
+  const pkg = await loadSellablePackage(gymId, packageId);
   const start = startDate ? toUtcMidnight(startDate) : todayUtc();
 
   return Member.create({
     ...details,
+    gym: gymId,
     ...snapshotOf(pkg),
     startDate: start,
     endDate: calculateEndDate(start, pkg.durationMonths),
@@ -75,13 +81,13 @@ export const createMember = async ({ packageId, startDate, ...details }) => {
  * Changing the package or the start date re-derives the end date; editing
  * only contact details leaves the membership period exactly as it was.
  */
-export const updateMember = async (id, { packageId, startDate, ...details }) => {
-  const member = await getMember(id);
+export const updateMember = async (gymId, id, { packageId, startDate, ...details }) => {
+  const member = await getMember(gymId, id);
 
   Object.assign(member, details);
 
   if (packageId && packageId !== member.package.toString()) {
-    Object.assign(member, snapshotOf(await loadSellablePackage(packageId)));
+    Object.assign(member, snapshotOf(await loadSellablePackage(gymId, packageId)));
   }
 
   if (startDate) {
@@ -102,9 +108,9 @@ export const updateMember = async (id, { packageId, startDate, ...details }) => 
  * Archives the period that is ending into `history` and starts a new one, so
  * the member drops out of the Expiry list and the gym keeps a purchase record.
  */
-export const renewMember = async (id, { packageId } = {}) => {
-  const member = await getMember(id);
-  const pkg = await loadSellablePackage(packageId ?? member.package.toString());
+export const renewMember = async (gymId, id, { packageId } = {}) => {
+  const member = await getMember(gymId, id);
+  const pkg = await loadSellablePackage(gymId, packageId ?? member.package.toString());
 
   member.history.push({
     package: member.package,

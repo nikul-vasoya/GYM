@@ -22,6 +22,12 @@ const membershipPeriodSchema = new mongoose.Schema(
  */
 const memberSchema = new mongoose.Schema(
   {
+    gym: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Gym',
+      required: true,
+      index: true,
+    },
     name: { type: String, required: true, trim: true },
     phone: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true },
@@ -52,11 +58,25 @@ memberSchema.path('endDate').validate(function validateEndDate(value) {
   return !this.startDate || value >= this.startDate;
 }, 'End date must be on or after the start date');
 
-// Sparse + unique: duplicates are blocked, but blanks never collide (D10).
-memberSchema.index({ email: 1 }, { unique: true, sparse: true });
-memberSchema.index({ phone: 1 }, { unique: true, sparse: true });
+/*
+ * Contact details are unique WITHIN a gym, not across the platform — two
+ * gyms may legitimately have the same person, or the same phone number.
+ *
+ * Partial, not sparse: a compound sparse index still indexes a document when
+ * ANY of its keys exist, and `gym` always exists — so every member with no
+ * email would be indexed under (gym, null) and the second one would collide.
+ * The partial filter indexes only the members that actually have the field.
+ */
+memberSchema.index(
+  { gym: 1, email: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: 'string' } } },
+);
+memberSchema.index(
+  { gym: 1, phone: 1 },
+  { unique: true, partialFilterExpression: { phone: { $type: 'string' } } },
+);
 // Supports the expiry and action-required queries, which sort by end date.
-memberSchema.index({ endDate: 1, durationMonths: 1 });
+memberSchema.index({ gym: 1, endDate: 1, durationMonths: 1 });
 
 memberSchema.set('toJSON', {
   virtuals: true,

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { requireAuth } from '../../middleware/requireAuth.js';
+import { requireAuth, requireGymUser } from '../../middleware/requireAuth.js';
 import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import {
@@ -14,7 +14,7 @@ import * as membersController from './members.controller.js';
 
 export const membersRouter = Router();
 
-membersRouter.use(requireAuth);
+membersRouter.use(requireAuth, requireGymUser);
 
 membersRouter.get(
   '/',
