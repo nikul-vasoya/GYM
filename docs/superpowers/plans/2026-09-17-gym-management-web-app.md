@@ -53,7 +53,7 @@ The SRS deliberately left several things open. These are the decisions this plan
 The MongoDB Atlas URI for this project was shared in plaintext chat:
 
 ```
-mongodb+srv://dev:<password>@node-setup.jmnbj.mongodb.net/gym_project
+mongodb+srv://<user>:<password>@<cluster>.mongodb.net/gym_project
 ```
 
 Treat that password as compromised.
@@ -739,7 +739,7 @@ Then create `server/.env`, pasting that output as `JWT_SECRET`:
 ```bash
 NODE_ENV=development
 PORT=4000
-MONGODB_URI=mongodb+srv://dev:<ATLAS_PASSWORD>@node-setup.jmnbj.mongodb.net/gym_project?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/gym_project?retryWrites=true&w=majority
 JWT_SECRET=<paste the generated string here>
 JWT_EXPIRES_IN=7d
 CLIENT_URL=http://localhost:5173
